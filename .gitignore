@@ -1,0 +1,25 @@
+# Dependencies
+node_modules/
+
+# Build output (regenerate with: npm run build)
+dist/
+
+# SQLite WAL/SHM files (transient)
+*.db-wal
+*.db-shm
+
+# Environment
+.env
+.env.local
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+
+# Logs
+*.log
+npm-debug.log*
