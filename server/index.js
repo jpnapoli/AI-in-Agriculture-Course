@@ -11,8 +11,8 @@ app.use(cors());
 app.use(express.json());
 // Serve generated images from public/images
 app.use('/images', express.static(path.join(__dirname, '../public/images'), {
-  maxAge: '7d',
-  immutable: true
+  maxAge: '1h',
+  etag: true
 }));
 app.use(express.static(path.join(__dirname, '../dist')));
 

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { CertificateIcon } from './CarbonIcons';
 
 export default function QuizComponent({ activity, onComplete }) {
   const [answers, setAnswers] = useState({});
@@ -23,8 +24,8 @@ export default function QuizComponent({ activity, onComplete }) {
 
   return (
     <div className="quiz-container">
-      <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 'var(--spacing-06)' }}>
-        <span className="material-icons-round" style={{ fontSize: 24, color: 'var(--interactive-primary)' }}>quiz</span>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--spacing-04)', marginBottom: 'var(--spacing-06)' }}>
+        <CertificateIcon size={24} color="var(--interactive-primary)" />
         <div>
           <h3 style={{ fontSize: '1.25rem' }}>{activity.title}</h3>
           {activity.description && <p style={{ fontSize: '0.875rem', color: 'var(--text-tertiary)' }}>{activity.description}</p>}
@@ -63,7 +64,7 @@ export default function QuizComponent({ activity, onComplete }) {
           Submit Answers
         </button>
       ) : (
-        <div style={{ marginTop: 'var(--spacing-05)', padding: 'var(--spacing-06)', background: score >= 70 ? 'rgba(66,190,101,0.08)' : 'rgba(218,30,40,0.08)', borderRadius: 8, textAlign: 'center' }}>
+        <div style={{ marginTop: 'var(--spacing-05)', padding: 'var(--spacing-06)', background: score >= 70 ? 'rgba(66,190,101,0.08)' : 'rgba(218,30,40,0.08)', textAlign: 'center' }}>
           <div style={{ fontSize: '2rem', fontWeight: 700, color: score >= 70 ? 'var(--support-success)' : 'var(--support-error)', fontFamily: 'var(--font-mono)' }}>{score}%</div>
           <div style={{ fontSize: '0.875rem', color: 'var(--text-secondary)' }}>{score >= 70 ? 'Great job! You passed this checkpoint.' : 'Review the material and try again.'}</div>
         </div>

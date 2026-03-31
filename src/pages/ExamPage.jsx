@@ -1,18 +1,20 @@
 import React, { useState, useEffect, useContext, useCallback } from 'react';
 import { AppContext } from '../App';
+import { TrophyIcon, ChevronLeftIcon, ChevronRightIcon, CheckmarkFilledIcon, PlayIcon, AiModelIcon, IdeaIcon, ArrowRightIcon, RestartIcon } from '../components/CarbonIcons';
 
-// Map each question to a contextual image based on module
-const QUESTION_IMAGES = {
-  'exam-q-1': '/images/exam-coffee-drone.jpg',
-  'exam-q-2': '/images/exam-wheat-field.jpg',
-  'exam-q-3': '/images/exam-ai-adoption.jpg',
-  'exam-q-4': '/images/exam-supply-chain.jpg',
-  'exam-q-5': '/images/exam-climate-weather.jpg',
-  'exam-q-6': '/images/exam-crop-genetics.jpg',
-  'exam-q-7': '/images/exam-iot-sensing.jpg',
-  'exam-q-8': '/images/exam-ai-adoption.jpg',
-  'exam-q-9': '/images/exam-coffee-drone.jpg',
-  'exam-q-10': '/images/exam-human-ai.jpg',
+// Module icon components for exam question headers (replacing AI-generated images)
+import {
+  SproutIcon, SatelliteIcon, CropGrowthIcon, CloudIcon,
+  DeliveryIcon, PartnershipIcon,
+} from '../components/CarbonIcons';
+
+const MODULE_ICON_MAP = {
+  'mod-1-revolution': { Icon: SproutIcon, label: 'Revolution' },
+  'mod-2-sensing': { Icon: SatelliteIcon, label: 'Sensing' },
+  'mod-3-crop-mgmt': { Icon: CropGrowthIcon, label: 'Crop Mgmt' },
+  'mod-4-climate': { Icon: CloudIcon, label: 'Climate' },
+  'mod-5-supply-chain': { Icon: DeliveryIcon, label: 'Supply Chain' },
+  'mod-6-future': { Icon: PartnershipIcon, label: 'Future' },
 };
 
 const MODULE_LABELS = {
@@ -92,7 +94,9 @@ export default function ExamPage() {
         <div className="graduation-card">
           {result.passed ? (
             <>
-              <img className="graduation-badge" src="/images/graduation-badge.png" alt="Badge" />
+              <div className="graduation-badge-icon">
+                <TrophyIcon size={64} color="#f1c21b" />
+              </div>
               <h2 className="graduation-title">Congratulations!</h2>
               <p style={{ color: 'var(--text-secondary)', marginBottom: 'var(--spacing-06)' }}>
                 You've earned your AI in Agriculture certification.
@@ -104,7 +108,7 @@ export default function ExamPage() {
             </>
           ) : (
             <>
-              <span className="material-icons-round" style={{ fontSize: 64, color: 'var(--support-warning)', marginBottom: 'var(--spacing-05)' }}>psychology</span>
+              <AiModelIcon size={64} color="var(--support-warning)" style={{ marginBottom: 'var(--spacing-05)' }} />
               <h2 className="graduation-title">Keep Learning!</h2>
               <p style={{ color: 'var(--text-secondary)', marginBottom: 'var(--spacing-06)' }}>
                 You need 70% to pass. Review the modules and try again.
@@ -112,6 +116,7 @@ export default function ExamPage() {
               <div className="graduation-score" style={{ color: 'var(--support-warning)' }}>{result.percentage}%</div>
               <button className="btn btn-primary btn-lg" style={{ marginTop: 'var(--spacing-06)' }}
                 onClick={() => { setResult(null); setAnswers({}); setStarted(false); setCurrentIndex(0); }}>
+                <RestartIcon size={18} />
                 Try Again
               </button>
             </>
@@ -148,7 +153,7 @@ export default function ExamPage() {
         <div className="exam-intro">
           <div className="exam-intro-visual">
             <div className="exam-intro-icon-ring">
-              <span className="material-icons-round" style={{ fontSize: 48, color: '#f1c21b' }}>emoji_events</span>
+              <TrophyIcon size={48} color="#f1c21b" />
             </div>
           </div>
           <h1 style={{ fontSize: '2rem', fontWeight: 600, marginBottom: 'var(--spacing-03)', textAlign: 'center' }}>
@@ -178,7 +183,7 @@ export default function ExamPage() {
           </div>
           <div style={{ textAlign: 'center', marginTop: 'var(--spacing-07)' }}>
             <button className="btn btn-primary btn-lg" onClick={() => setStarted(true)}>
-              <span className="material-icons-round" style={{ fontSize: 18 }}>play_arrow</span>
+              <PlayIcon size={18} />
               Begin Exam
             </button>
           </div>
@@ -190,7 +195,7 @@ export default function ExamPage() {
   // =========== FLOATING CARD DECK VIEW ===========
   const q = questions[currentIndex];
   if (!q) return null;
-  const qImage = QUESTION_IMAGES[q.id] || '/images/exam-human-ai.jpg';
+  // No AI-generated images — using Carbon icon headers instead
   const moduleLabel = MODULE_LABELS[q.module_id] || '';
   const moduleColor = MODULE_COLORS[q.module_id] || 'var(--interactive-primary)';
 
@@ -199,7 +204,7 @@ export default function ExamPage() {
       {/* Top bar */}
       <div className="exam-deck-topbar">
         <div className="exam-deck-topbar-left">
-          <span className="material-icons-round" style={{ fontSize: 18, color: 'var(--ibm-yellow-30)' }}>emoji_events</span>
+          <TrophyIcon size={18} color="var(--ibm-yellow-30)" />
           <span style={{ fontSize: '0.875rem', fontWeight: 600 }}>Final Examination</span>
         </div>
         <div className="exam-deck-topbar-right">
@@ -218,19 +223,23 @@ export default function ExamPage() {
           disabled={currentIndex === 0}
           aria-label="Previous question"
         >
-          <span className="material-icons-round">chevron_left</span>
+          <ChevronLeftIcon size={24} />
         </button>
 
         {/* The floating card */}
         <div className={`exam-deck-card ${slideDirection}`} key={currentIndex}>
-          {/* Card image */}
-          <div className="exam-deck-card-image">
-            <img src={qImage} alt="" loading="lazy" />
-            <div className="exam-deck-card-image-overlay">
-              <span className="exam-deck-card-badge" style={{ borderColor: moduleColor, color: moduleColor }}>
-                {moduleLabel}
-              </span>
+          {/* Card header with Carbon icon */}
+          <div className="exam-deck-card-header" style={{ borderBottom: `3px solid ${moduleColor}` }}>
+            <div className="exam-deck-card-header-icon">
+              {(() => {
+                const modInfo = MODULE_ICON_MAP[q.module_id];
+                const IconComp = modInfo?.Icon || SproutIcon;
+                return <IconComp size={28} color={moduleColor} />;
+              })()}
             </div>
+            <span className="exam-deck-card-badge" style={{ borderColor: moduleColor, color: moduleColor }}>
+              {moduleLabel}
+            </span>
             <div className="exam-deck-card-qnum">
               {currentIndex + 1} / {questions.length}
             </div>
@@ -247,7 +256,7 @@ export default function ExamPage() {
 
             {q.scenario_context && (
               <div className="exam-deck-card-scenario">
-                <span className="material-icons-round" style={{ fontSize: 14, flexShrink: 0, marginTop: 2 }}>lightbulb</span>
+                <IdeaIcon size={14} style={{ flexShrink: 0, marginTop: 2 }} />
                 <span>{q.scenario_context}</span>
               </div>
             )}
@@ -259,7 +268,7 @@ export default function ExamPage() {
                   {q.options.map((pair, pi) => (
                     <div key={pi} className="exam-deck-matching-row">
                       <span className="exam-deck-matching-concept">{pair.concept}</span>
-                      <span className="material-icons-round" style={{ fontSize: 14, color: 'var(--text-tertiary)' }}>arrow_forward</span>
+                      <ArrowRightIcon size={14} color="var(--text-tertiary)" />
                       <span className="exam-deck-matching-app">{pair.application}</span>
                     </div>
                   ))}
@@ -308,7 +317,7 @@ export default function ExamPage() {
           disabled={currentIndex === questions.length - 1}
           aria-label="Next question"
         >
-          <span className="material-icons-round">chevron_right</span>
+          <ChevronRightIcon size={24} />
         </button>
       </div>
 
@@ -332,7 +341,7 @@ export default function ExamPage() {
 
         {allAnswered ? (
           <button className="btn btn-primary" onClick={handleSubmit} style={{ marginTop: 'var(--spacing-05)' }}>
-            <span className="material-icons-round" style={{ fontSize: 18 }}>check_circle</span>
+            <CheckmarkFilledIcon size={18} />
             Submit Exam
           </button>
         ) : (

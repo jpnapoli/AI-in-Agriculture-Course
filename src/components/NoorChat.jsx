@@ -1,6 +1,30 @@
 import React, { useState, useRef, useEffect, useContext, useCallback } from 'react';
 import { AppContext } from '../App';
 import { useLocation } from 'react-router-dom';
+import { CloseIcon, MicrophoneIcon, MicrophoneOffIcon, SendIcon, VolumeUpIcon, VolumeOffIcon, CopyIcon, StopIcon } from '../components/CarbonIcons';
+
+// Custom Noor icon - stylized leaf+circuit design
+function NoorIcon({ size = 22, color = 'currentColor' }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+      {/* Leaf shape with neural circuit lines */}
+      <path d="M16 3C10 3 5 9 5 16c0 6 4 11 9 12.5V18l-4-3.5" stroke={color} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" fill="none" />
+      <path d="M16 3c6 0 11 6 11 13 0 6-4 11-9 12.5V18l4-3.5" stroke={color} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" fill="none" />
+      {/* Central vein */}
+      <line x1="16" y1="6" x2="16" y2="28" stroke={color} strokeWidth="1.8" strokeLinecap="round" />
+      {/* Neural nodes */}
+      <circle cx="16" cy="10" r="1.5" fill={color} />
+      <circle cx="12" cy="14" r="1.2" fill={color} />
+      <circle cx="20" cy="14" r="1.2" fill={color} />
+      <circle cx="16" cy="18" r="1.5" fill={color} />
+      {/* Cross connections */}
+      <line x1="12" y1="14" x2="16" y2="10" stroke={color} strokeWidth="1" strokeLinecap="round" opacity="0.6" />
+      <line x1="20" y1="14" x2="16" y2="10" stroke={color} strokeWidth="1" strokeLinecap="round" opacity="0.6" />
+      <line x1="12" y1="14" x2="16" y2="18" stroke={color} strokeWidth="1" strokeLinecap="round" opacity="0.6" />
+      <line x1="20" y1="14" x2="16" y2="18" stroke={color} strokeWidth="1" strokeLinecap="round" opacity="0.6" />
+    </svg>
+  );
+}
 
 // Set your OpenAI API key in environment variable VITE_OPENAI_API_KEY
 const OPENAI_API_KEY = import.meta.env.VITE_OPENAI_API_KEY || '';
@@ -8,39 +32,43 @@ const OPENAI_API_KEY = import.meta.env.VITE_OPENAI_API_KEY || '';
 const NOOR_CONFIG = {
   name: 'Noor',
   subtitle: 'AI Agriculture Companion',
-  tts: { model: 'tts-1-hd', voice: 'nova', speed: 1.0, format: 'mp3' },
-  llm: { model: 'gpt-4o-mini', temperature: 0.6, max_tokens: 800 },
+  tts: { model: 'tts-1-hd', voice: 'nova', speed: 1.05, format: 'mp3' },
+  llm: { model: 'gpt-4o-mini', temperature: 0.7, max_tokens: 200 },
   stt: { silenceTimeout: 2500 },
   quickAsk: [
     'What is precision agriculture?',
-    'Explain AI in farming',
-    'Key course concepts',
-    'Latest AgriTech trends'
+    'Explain generative AI briefly',
+    'Key course topics',
+    'Tell me about the personas'
   ]
 };
 
-const SYSTEM_PROMPT = `You are Noor (نور), an AI Agriculture Research Companion created for the "AI in Agriculture: From Field to Future" course. You are knowledgeable, concise, and professional. Answer questions about agricultural AI, precision farming, IoT in agriculture, climate resilience, supply chain intelligence, and the human-AI partnership.
+const SYSTEM_PROMPT = `You are Noor (نور), a friendly AI companion for the "AI in Agriculture" course. You talk like a knowledgeable friend — warm, quick, and natural.
 
-Key course topics:
-- The 4th Agricultural Revolution & AI's $250B value potential (McKinsey)
-- IoT sensors, drones, satellites for data collection (Microsoft FarmBeats, IBM Liquid Prep)
-- AI-powered crop management (computer vision, precision planting, IBM Watson Decision Platform)
-- Climate resilience (ClimateAi, Google flood forecasting)
-- Intelligent supply chains (demand forecasting, food safety)
-- Human-AI augmentation, ethics, McKinsey's 7 pillars of AI readiness
+STYLE RULES (critical):
+- Keep answers SHORT: 1–3 sentences for simple questions. Only go longer if the user asks for detail.
+- Sound human. Use contractions ("it's", "you'll"), casual connectors ("basically", "so", "think of it like").
+- No bullet lists unless the user asks to list things. Prefer flowing sentences.
+- If a topic is complex, give a quick answer first, then offer: "Want me to go deeper?"
+- Match the user's energy. Short question = short answer. Detailed question = more detail.
+- Never say you can't browse — answer from what you know.
+- Reference course personas and modules naturally when relevant.
 
-Personas: Amara Johnson (wheat farmer, Kansas), Carlos Mendoza (coffee farmer, Colombia), Dr. Fatima Okafor (agronomist, Nigeria), Rajan Patel (food distributor, India).
+COURSE KNOWLEDGE:
+- 6 modules: AI Revolution, Sensing, Crop Management, Climate Resilience, Supply Chain, Human-AI Future
+- Personas: Khalid Al-Rashidi (Saudi, desert AgriTech), Amara Johnson (Kansas wheat), Carlos Mendoza (Colombia coffee), Dr. Fatima Okafor (Nigeria agronomist), Rajan Patel (India supply chain)
+- Key themes: 4th Agricultural Revolution, IoT/drones, computer vision, climate AI, supply chain intelligence, AI ethics
 
-Rules:
-- Be concise but thorough. Use bullet points for complex answers.
-- Never say you can't browse or search — rely on your training data.
-- Match the user's language.
-- Reference course content and real case studies when relevant.`;
+Examples of good responses:
+Q: "What is generative AI?" A: "It's AI that creates new content — text, images, code — based on patterns it learned from existing data. In agriculture, it can generate crop management plans or write advisory reports. We touch on this in Module 6."
+Q: "Who is Amara?" A: "Amara Johnson is a 3rd-gen wheat farmer from Kansas. She was skeptical about AI until it boosted her yields 12%. You'll follow her story mainly in Module 1."
+
+Keep it conversational. Think chat, not lecture.`;
 
 export default function NoorChat() {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState([
-    { role: 'assistant', text: "Hi! I'm Noor, your AI agriculture learning companion. Ask me anything about the course content, request deeper explanations, or explore research topics. I'm here to amplify your learning! 🌱" }
+    { role: 'assistant', text: "Hey! I'm Noor, your AI agriculture companion. Ask me anything about the course — I'll keep it quick and useful." }
   ]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
@@ -327,9 +355,9 @@ export default function NoorChat() {
       {/* FAB Button */}
       <button className="noor-fab" onClick={() => setIsOpen(!isOpen)} title="Chat with Noor">
         {isOpen ? (
-          <span className="material-icons-round">close</span>
+          <CloseIcon size={20} color="white" />
         ) : (
-          <img src="/images/icon-noor.png" alt="Noor" style={{ width: 28, height: 28, borderRadius: '50%', objectFit: 'cover' }} />
+          <NoorIcon size={24} color="currentColor" />
         )}
       </button>
 
@@ -338,7 +366,7 @@ export default function NoorChat() {
           {/* Header */}
           <div className="noor-header">
             <div className="noor-avatar-sm">
-              <img src="/images/icon-noor.png" alt="Noor" style={{ width: 28, height: 28, borderRadius: '50%', objectFit: 'cover' }} />
+              <NoorIcon size={22} color="currentColor" />
             </div>
             <div className="noor-header-info">
               <div className="noor-header-name">{NOOR_CONFIG.name}</div>
@@ -353,7 +381,7 @@ export default function NoorChat() {
                 style={{
                   background: autoSpeak ? 'rgba(15,98,254,0.1)' : 'transparent',
                   border: '1px solid var(--border-subtle)',
-                  borderRadius: 4,
+                  borderRadius: 0,
                   padding: '4px 8px',
                   cursor: 'pointer',
                   display: 'flex',
@@ -365,7 +393,7 @@ export default function NoorChat() {
                 }}
                 title={autoSpeak ? 'Auto-speak ON' : 'Auto-speak OFF'}
               >
-                <span className="material-icons-round" style={{ fontSize: 14 }}>{autoSpeak ? 'volume_up' : 'volume_off'}</span>
+                {autoSpeak ? <VolumeUpIcon size={14} /> : <VolumeOffIcon size={14} />}
               </button>
             </div>
           </div>
@@ -396,14 +424,14 @@ export default function NoorChat() {
                       style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 2, color: 'var(--text-tertiary)', display: 'flex', alignItems: 'center' }}
                       title="Read aloud"
                     >
-                      <span className="material-icons-round" style={{ fontSize: 14 }}>volume_up</span>
+                      <VolumeUpIcon size={14} />
                     </button>
                     <button
                       onClick={() => { navigator.clipboard.writeText(msg.text); }}
                       style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 2, color: 'var(--text-tertiary)', display: 'flex', alignItems: 'center' }}
                       title="Copy"
                     >
-                      <span className="material-icons-round" style={{ fontSize: 14 }}>content_copy</span>
+                      <CopyIcon size={14} />
                     </button>
                   </div>
                 )}
@@ -424,7 +452,7 @@ export default function NoorChat() {
           {/* Listening Bar */}
           {voiceState === 'listening' && (
             <div className="noor-listening-bar">
-              <span className="material-icons-round" style={{ fontSize: 16, color: '#da1e28' }}>mic</span>
+              <MicrophoneIcon size={16} color="#da1e28" />
               <div className="noor-listening-text">
                 {interimText || 'Listening... tap mic or wait to send'}
               </div>
@@ -434,7 +462,7 @@ export default function NoorChat() {
           {/* Stop Speaking Bar */}
           {voiceState === 'speaking' && (
             <div className="noor-stop-bar" onClick={stopSpeaking}>
-              <span className="material-icons-round" style={{ fontSize: 16, color: 'var(--interactive-primary)' }}>stop_circle</span>
+              <StopIcon size={16} color="var(--interactive-primary)" />
               <span className="noor-stop-text">Stop Speaking</span>
               <div className="noor-voice-wave">
                 <div className="noor-voice-bar" />
@@ -453,9 +481,7 @@ export default function NoorChat() {
               onClick={toggleMic}
               title={voiceState === 'listening' ? 'Stop listening' : 'Start voice input'}
             >
-              <span className="material-icons-round" style={{ fontSize: 18 }}>
-                {voiceState === 'listening' ? 'mic' : 'mic_none'}
-              </span>
+              {voiceState === 'listening' ? <MicrophoneIcon size={18} /> : <MicrophoneOffIcon size={18} />}
             </button>
             <textarea
               ref={inputRef}
@@ -471,7 +497,7 @@ export default function NoorChat() {
               onClick={() => handleSendMessage()}
               disabled={loading || (!input.trim() && voiceState !== 'listening')}
             >
-              <span className="material-icons-round" style={{ fontSize: 18 }}>send</span>
+              <SendIcon size={18} color="white" />
             </button>
           </div>
         </div>
