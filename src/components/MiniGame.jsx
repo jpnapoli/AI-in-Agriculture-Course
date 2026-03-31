@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { CheckmarkFilledIcon, TrophyIcon, LocationIcon, GameControllerIcon } from './CarbonIcons';
 
 export default function MiniGame({ game, onComplete }) {
   switch (game.type) {
@@ -54,13 +55,13 @@ function SpotAIGame({ game, onComplete }) {
               style={{ cursor: isFound ? 'default' : 'pointer', minHeight: 100 }}>
               <span style={{ fontSize: 32, marginBottom: 4 }}>{obj.emoji}</span>
               <span style={{ fontWeight: 500 }}>{obj.label}</span>
-              {isFound && <span className="material-icons-round" style={{ color: 'var(--support-success)', fontSize: 16, marginTop: 4 }}>check_circle</span>}
+              {isFound && <CheckmarkFilledIcon size={16} color="var(--support-success)" style={{ marginTop: 4 }} />}
             </div>
           );
         })}
       </div>
       {showInfo && (
-        <div style={{ marginTop: 16, padding: 16, background: 'var(--bg-primary)', borderRadius: 8, border: '1px solid var(--support-success)', animation: 'fadeInUp 0.3s ease-out' }}>
+        <div style={{ marginTop: 16, padding: 16, background: 'var(--bg-primary)', border: '1px solid var(--support-success)', animation: 'fadeInUp 0.3s ease-out' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <strong style={{ color: 'var(--support-success)' }}>{showInfo.label}</strong>
             <button className="btn btn-ghost" onClick={() => setShowInfo(null)} style={{ fontSize: '0.75rem' }}>Close</button>
@@ -69,8 +70,8 @@ function SpotAIGame({ game, onComplete }) {
         </div>
       )}
       {done && (
-        <div style={{ marginTop: 20, padding: 20, background: 'rgba(66,190,101,0.08)', borderRadius: 8, textAlign: 'center' }}>
-          <span className="material-icons-round" style={{ fontSize: 40, color: 'var(--support-success)' }}>emoji_events</span>
+        <div style={{ marginTop: 20, padding: 20, background: 'rgba(66,190,101,0.08)', textAlign: 'center' }}>
+          <TrophyIcon size={40} color="var(--support-success)" />
           <div style={{ fontSize: '1.5rem', fontWeight: 700, color: 'var(--support-success)', fontFamily: 'var(--font-mono)', marginTop: 8 }}>All Found!</div>
           <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>You identified all AI systems on the farm.</p>
         </div>
@@ -119,8 +120,8 @@ function DronePilotGame({ game, onComplete }) {
           const bg = wasClicked && cell.zone ? cell.zone.color : wasClicked ? 'var(--support-error)' : '#26de81';
           return (
             <div key={i} onClick={() => handleClick(cell.x, cell.y, cell.zone)}
-              style={{ aspectRatio: '1', background: wasClicked ? bg : `hsl(${120 + Math.random() * 20}, 50%, ${30 + Math.random() * 15}%)`, borderRadius: 4, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.6rem', color: '#fff', opacity: wasClicked ? 1 : 0.8, transition: 'all 0.2s', border: wasClicked && cell.zone ? '2px solid #fff' : '1px solid rgba(255,255,255,0.1)' }}>
-              {wasClicked && cell.zone && <span className="material-icons-round" style={{ fontSize: 14 }}>location_on</span>}
+              style={{ aspectRatio: '1', background: wasClicked ? bg : `hsl(${120 + Math.random() * 20}, 50%, ${30 + Math.random() * 15}%)`, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.6rem', color: '#fff', opacity: wasClicked ? 1 : 0.8, transition: 'all var(--transition-fast)', border: wasClicked && cell.zone ? '2px solid #fff' : '1px solid rgba(255,255,255,0.1)' }}>
+              {wasClicked && cell.zone && <LocationIcon size={14} color="#fff" />}
             </div>
           );
         })}
@@ -128,7 +129,7 @@ function DronePilotGame({ game, onComplete }) {
       <div style={{ display: 'flex', gap: 'var(--spacing-05)', marginTop: 'var(--spacing-04)', flexWrap: 'wrap' }}>
         {[{ color: '#ff6b6b', label: 'Water Stress' }, { color: '#ffd93d', label: 'Nutrient Deficiency' }, { color: '#ff9f43', label: 'Pest Damage' }, { color: '#a55eea', label: 'Disease' }, { color: '#26de81', label: 'Healthy' }].map(l => (
           <div key={l.label} style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: '0.75rem', color: 'var(--text-tertiary)' }}>
-            <div style={{ width: 10, height: 10, borderRadius: 2, background: l.color }} /> {l.label}
+            <div style={{ width: 10, height: 10, background: l.color }} /> {l.label}
           </div>
         ))}
       </div>
@@ -164,7 +165,7 @@ function CropDoctorGame({ game, onComplete }) {
         <div><h3>{game.title}</h3><p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>Case {currentCase + 1} of {cases.length}</p></div>
         <div className="game-score">{totalScore} pts</div>
       </div>
-      <div style={{ background: 'var(--bg-primary)', borderRadius: 8, padding: 20, marginBottom: 16 }}>
+      <div style={{ background: 'var(--bg-primary)', padding: 20, marginBottom: 16 }}>
         <div style={{ fontSize: '0.75rem', color: 'var(--interactive-primary)', fontWeight: 600, marginBottom: 8, textTransform: 'uppercase' }}>Symptoms</div>
         <p style={{ fontSize: '0.9rem', marginBottom: 12 }}>{c.symptoms}</p>
         <div style={{ fontSize: '0.75rem', color: 'var(--interactive-primary)', fontWeight: 600, marginBottom: 8, textTransform: 'uppercase' }}>Data</div>
@@ -184,7 +185,7 @@ function CropDoctorGame({ game, onComplete }) {
         <button className="btn btn-primary" onClick={handleReveal} disabled={!selected} style={{ opacity: selected ? 1 : 0.5 }}>Check Diagnosis</button>
       ) : (
         <div>
-          <div style={{ padding: 12, background: selected === c.diagnosis ? 'rgba(66,190,101,0.08)' : 'rgba(218,30,40,0.08)', borderRadius: 8, marginBottom: 12 }}>
+          <div style={{ padding: 12, background: selected === c.diagnosis ? 'rgba(66,190,101,0.08)' : 'rgba(218,30,40,0.08)', marginBottom: 12 }}>
             <strong>Treatment: </strong><span style={{ fontSize: '0.85rem' }}>{c.treatment}</span>
           </div>
           <button className="btn btn-primary" onClick={handleNext}>{currentCase < cases.length - 1 ? 'Next Case' : 'Complete Game'}</button>
@@ -221,7 +222,7 @@ function WeatherGame({ game, onComplete }) {
       </div>
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 8, marginBottom: 16 }}>
         {Object.entries(r.data).map(([k, v]) => (
-          <div key={k} style={{ background: 'var(--bg-primary)', borderRadius: 8, padding: 12, textAlign: 'center' }}>
+          <div key={k} style={{ background: 'var(--bg-primary)', padding: 12, textAlign: 'center' }}>
             <div style={{ fontSize: '0.65rem', color: 'var(--text-tertiary)', textTransform: 'uppercase', marginBottom: 4 }}>{k}</div>
             <div style={{ fontSize: '1.1rem', fontWeight: 700, fontFamily: 'var(--font-mono)' }}>{typeof v === 'number' ? v : v}</div>
           </div>
@@ -298,7 +299,7 @@ function GenericGame({ game, onComplete }) {
         <div><h3>{game.title}</h3><p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>{game.description}</p></div>
       </div>
       <div style={{ textAlign: 'center', padding: 40 }}>
-        <span className="material-icons-round" style={{ fontSize: 48, color: 'var(--interactive-primary)' }}>sports_esports</span>
+        <GameControllerIcon size={48} color="var(--interactive-primary)" />
         <p style={{ marginTop: 12 }}>Game loading...</p>
         <button className="btn btn-primary" style={{ marginTop: 16 }} onClick={() => onComplete && onComplete(80)}>Complete Game</button>
       </div>

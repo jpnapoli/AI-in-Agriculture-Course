@@ -6,6 +6,7 @@ import LessonPage from './pages/LessonPage';
 import ExamPage from './pages/ExamPage';
 import CourseOverviewPage from './pages/CourseOverviewPage';
 import NoorChat from './components/NoorChat';
+import { DashboardIcon, InformationIcon, CertificateIcon, SunIcon, MoonIcon, EcoIcon } from './components/CarbonIcons';
 
 export const AppContext = createContext();
 
@@ -51,28 +52,38 @@ function AppProvider({ children }) {
 }
 
 function TopNav() {
-  const { theme, toggleTheme } = useContext(AppContext);
+  const { theme, toggleTheme, progress } = useContext(AppContext);
   const navigate = useNavigate();
   const location = useLocation();
+  const overallPct = progress?.overallPercentage || 0;
 
   return (
     <nav className="top-nav">
       <div className="nav-brand" onClick={() => navigate('/')}>
-        <img src="/images/icon-course.png" alt="AI in Agriculture" className="brand-icon-img" />
+        <EcoIcon size={24} color="var(--interactive-primary)" />
         <span>AI in Agriculture</span>
       </div>
+
+      {/* Overall course progress bar */}
+      <div className="nav-progress">
+        <div className="nav-progress-bar">
+          <div className="nav-progress-fill" style={{ width: `${overallPct}%` }} />
+        </div>
+        <span className="nav-progress-label">{overallPct}%</span>
+      </div>
+
       <div className="nav-links">
         <div className={`nav-link ${location.pathname === '/' ? 'active' : ''}`} onClick={() => navigate('/')}>
-          <span className="material-icons-round" style={{fontSize:16}}>dashboard</span> Dashboard
+          <InformationIcon size={16} /> Overview
         </div>
-        <div className={`nav-link ${location.pathname === '/overview' ? 'active' : ''}`} onClick={() => navigate('/overview')}>
-          <span className="material-icons-round" style={{fontSize:16}}>info</span> Overview
+        <div className={`nav-link ${location.pathname === '/dashboard' ? 'active' : ''}`} onClick={() => navigate('/dashboard')}>
+          <DashboardIcon size={16} /> Dashboard
         </div>
         <div className={`nav-link ${location.pathname === '/exam' ? 'active' : ''}`} onClick={() => navigate('/exam')}>
-          <span className="material-icons-round" style={{fontSize:16}}>quiz</span> Final Exam
+          <CertificateIcon size={16} /> Final Exam
         </div>
         <button className="theme-toggle" onClick={toggleTheme} title="Toggle theme">
-          <span className="material-icons-round">{theme === 'dark' ? 'light_mode' : 'dark_mode'}</span>
+          {theme === 'dark' ? <SunIcon size={18} /> : <MoonIcon size={18} />}
         </button>
       </div>
     </nav>
@@ -86,8 +97,8 @@ function App() {
         <div className="app-container">
           <TopNav />
           <Routes>
-            <Route path="/" element={<Dashboard />} />
-            <Route path="/overview" element={<CourseOverviewPage />} />
+            <Route path="/" element={<CourseOverviewPage />} />
+            <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/module/:moduleId" element={<ModulePage />} />
             <Route path="/lesson/:lessonId" element={<LessonPage />} />
             <Route path="/exam" element={<ExamPage />} />

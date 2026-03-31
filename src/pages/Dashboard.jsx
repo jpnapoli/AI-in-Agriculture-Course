@@ -1,130 +1,228 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect, useContext, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AppContext } from '../App';
+import {
+  SproutIcon, SatelliteIcon, CropGrowthIcon, CloudIcon, DeliveryIcon,
+  PartnershipIcon, CheckmarkIcon, TrophyIcon, TimeIcon, CatalogIcon,
+  ArrowRightIcon, WatsonIcon, GameControllerIcon, AiModelIcon,
+  TerminalIcon, PlayFilledIcon, EcoIcon, SchoolIcon,
+  ChevronLeftIcon, ChevronRightIcon, LocationIcon,
+  InformationIcon, CheckmarkFilledIcon, SendIcon,
+  BotIcon,
+} from '../components/CarbonIcons';
 
-const MODULE_ICONS = { 1: 'spa', 2: 'satellite_alt', 3: 'grass', 4: 'cloud', 5: 'local_shipping', 6: 'people' };
-const MODULE_COLORS = { 1: '#198038', 2: '#0043ce', 3: '#8a3ffc', 4: '#007d79', 5: '#f1c21b', 6: '#ee5396' };
-
-// Local persona images (served from public/images)
-const PERSONA_IMAGES = {
-  amara: '/images/persona-amara.png',
-  carlos: '/images/persona-carlos.png',
-  fatima: '/images/persona-fatima.png',
-  rajan: '/images/persona-rajan.png',
+const MODULE_ICONS = {
+  1: SproutIcon, 2: SatelliteIcon, 3: CropGrowthIcon,
+  4: CloudIcon, 5: DeliveryIcon, 6: PartnershipIcon,
 };
 
-function SafeImage({ src, alt, className, style, fallbackIcon }) {
-  const [error, setError] = useState(false);
-  if (error || !src) {
-    return (
-      <div className="img-fallback" style={{ ...style, borderRadius: style?.borderRadius }}>
-        <span className="material-icons-round" style={{ fontSize: 40, opacity: 0.4 }}>{fallbackIcon || 'image'}</span>
-      </div>
-    );
-  }
-  return <img src={src} alt={alt} className={className} style={style} loading="lazy" onError={() => setError(true)} />;
-}
+const MODULE_IMAGES = {
+  1: '/images/modules/mod1-revolution.jpg',
+  2: '/images/modules/mod2-sensing.jpg',
+  3: '/images/modules/mod3-crop.jpg',
+  4: '/images/modules/mod4-climate.jpg',
+  5: '/images/modules/mod5-supply.jpg',
+  6: '/images/modules/mod6-future.jpg',
+};
 
-// ============================================================
-// Interactive Journey Roadmap Component
-// ============================================================
-function JourneyRoadmap({ modules, getModProgress, navigate }) {
-  const [hoveredNode, setHoveredNode] = useState(null);
-  const [popupPos, setPopupPos] = useState({ x: 0, y: 0 });
+const MODULE_COLORS = {
+  1: '#198038', 2: '#0043ce', 3: '#8a3ffc',
+  4: '#007d79', 5: '#f1c21b', 6: '#ee5396',
+};
 
-  const handleMouseEnter = (mod, i, e) => {
-    const rect = e.currentTarget.getBoundingClientRect();
-    setPopupPos({ x: rect.left + rect.width / 2, y: rect.top });
-    setHoveredNode({ mod, index: i, pct: getModProgress(mod.id) });
+const MODULE_DESCRIPTIONS = {
+  1: 'Explore the Fourth Agricultural Revolution and how AI, machine learning, and data analytics are reshaping global food production.',
+  2: 'Learn how IoT sensors, drone imaging, satellite data, and edge computing create the data foundation for smart farming decisions.',
+  3: 'Apply computer vision, precision planting, variable-rate technology, and predictive models to optimize crop yields and reduce waste.',
+  4: 'Build AI-powered systems for weather forecasting, drought prediction, flood management, and carbon footprint optimization.',
+  5: 'Implement demand forecasting, cold-chain monitoring, food safety AI, and waste reduction across agricultural supply networks.',
+  6: 'Navigate AI ethics, organizational readiness, the 7 pillars of AI adoption, and human-AI partnership in agriculture.',
+};
+
+const MODULE_TOPICS = {
+  1: ['4th Agricultural Revolution', 'Global adoption patterns', 'AI value framework'],
+  2: ['IoT sensors & edge computing', 'Drone & satellite imaging', 'Data pipelines'],
+  3: ['Computer vision for crops', 'Precision planting', 'Yield prediction'],
+  4: ['Weather forecasting AI', 'Drought & flood systems', 'Climate adaptation'],
+  5: ['Demand forecasting', 'Cold chain monitoring', 'Waste reduction'],
+  6: ['AI ethics in agriculture', 'Organizational readiness', 'Future workforce'],
+};
+
+const PERSONA_PHOTOS = {
+  'Khalid Al-Rashidi': '/images/persona-khalid.png',
+  'Amara Johnson': '/images/persona-amara.png',
+  'Carlos Mendoza': '/images/persona-carlos.png',
+  'Dr. Fatima Okafor': '/images/persona-fatima.png',
+  'Rajan Patel': '/images/persona-rajan.png',
+};
+
+const PERSONA_CHAT_CONFIG = [
+  {
+    name: 'Khalid Al-Rashidi',
+    role: 'AgriTech Director',
+    location: 'Riyadh, Saudi Arabia',
+    color: '#da1e28',
+    expertise: 'Desert Agriculture, Controlled-Environment Farming, AI-Driven Water Management',
+    accent: 'Saudi Arabian',
+    personality: 'Visionary and direct, speaks with authority about sustainable desert farming and Vision 2030 initiatives.',
+    greeting: 'As-salamu alaykum! I\'m Khalid. Let me share how we use AI to grow food in the desert. What would you like to know about controlled-environment agriculture?',
+    sampleTopics: ['Hydroponic greenhouse AI', 'Water conservation tech', 'Vision 2030 agriculture'],
+  },
+  {
+    name: 'Amara Johnson',
+    role: 'Wheat Farmer',
+    location: 'Kansas, USA',
+    color: '#198038',
+    expertise: 'Precision Agriculture, Variable-Rate Technology, Farm Data Analytics',
+    accent: 'American Midwestern',
+    personality: 'Practical and warm, bridges traditional farming wisdom with modern AI tools.',
+    greeting: 'Hey there! I\'m Amara. I went from skeptic to AI advocate after seeing my yields jump 12%. Ask me anything about bringing AI to the field!',
+    sampleTopics: ['GPS-guided farming', 'Soil analysis AI', 'Cooperative tech adoption'],
+  },
+  {
+    name: 'Carlos Mendoza',
+    role: 'Coffee Farmer',
+    location: 'Huila, Colombia',
+    color: '#0043ce',
+    expertise: 'IoT Sensor Networks, Drone Imaging, Specialty Crop Monitoring',
+    accent: 'Colombian Spanish',
+    personality: 'Passionate and innovative, enthusiastic about how technology preserves artisanal quality.',
+    greeting: 'Hola! I\'m Carlos. My drones and sensors help me grow world-class coffee sustainably. Want to learn about precision agriculture for specialty crops?',
+    sampleTopics: ['Coffee leaf rust detection', 'Multispectral drone imaging', 'Soil moisture IoT'],
+  },
+  {
+    name: 'Dr. Fatima Okafor',
+    role: 'Agronomist',
+    location: 'Lagos, Nigeria',
+    color: '#8a3ffc',
+    expertise: 'Satellite Monitoring, AI Advisory Platforms, Smallholder Farm Support',
+    accent: 'Nigerian English',
+    personality: 'Empathetic and analytical, passionate about scaling AI to serve millions of smallholder farmers.',
+    greeting: 'Welcome! I\'m Dr. Okafor. I use satellite AI to help 50 farms make better decisions. Let me show you how AI advisory can scale across Africa!',
+    sampleTopics: ['Satellite early warning', 'Low-connectivity AI', 'Cassava crop management'],
+  },
+  {
+    name: 'Rajan Patel',
+    role: 'Food Distributor',
+    location: 'Mumbai, India',
+    color: '#007d79',
+    expertise: 'Supply Chain AI, Cold-Chain Monitoring, Demand Forecasting',
+    accent: 'Indian English',
+    personality: 'Energetic and data-driven, focused on reducing food waste through smart logistics.',
+    greeting: 'Namaste! I\'m Rajan. My AI systems reduced food waste by 40% across 200 distribution points. Ask me about smart supply chains!',
+    sampleTopics: ['Cold-chain IoT sensors', 'Demand prediction AI', 'Food waste reduction'],
+  },
+];
+
+// ── 1-1 Expert Chat Card ──
+function ExpertChatCard({ persona }) {
+  const [messages, setMessages] = useState([
+    { role: 'assistant', text: persona.greeting },
+  ]);
+  const [input, setInput] = useState('');
+  const [isOpen, setIsOpen] = useState(false);
+  const messagesEndRef = useRef(null);
+  const photoSrc = PERSONA_PHOTOS[persona.name];
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
-  const handleMouseLeave = () => {
-    setHoveredNode(null);
+  useEffect(() => {
+    if (isOpen) scrollToBottom();
+  }, [messages, isOpen]);
+
+  const handleSend = () => {
+    if (!input.trim()) return;
+    const userMsg = input.trim();
+    setMessages(prev => [...prev, { role: 'user', text: userMsg }]);
+    setInput('');
+
+    // Simulate expert response
+    setTimeout(() => {
+      const responses = [
+        `Great question! In my experience working in ${persona.location}, I've found that ${userMsg.toLowerCase().includes('ai') ? 'AI tools' : 'technology'} can transform how we approach this challenge.`,
+        `That's something I deal with every day. As a ${persona.role}, I've seen firsthand how the right approach makes all the difference. Let me explain...`,
+        `Interesting! This relates directly to what we cover in our course modules on ${persona.expertise.split(',')[0]}. The key insight is that practical application matters most.`,
+      ];
+      setMessages(prev => [...prev, {
+        role: 'assistant',
+        text: responses[Math.floor(Math.random() * responses.length)],
+      }]);
+    }, 800 + Math.random() * 1200);
   };
 
   return (
-    <div className="roadmap-container">
-      <div className="roadmap-track">
-        {modules.map((mod, i) => {
-          const pct = getModProgress(mod.id);
-          const isCompleted = pct === 100;
-          const isActive = pct > 0 && pct < 100;
-          const nodeColor = isCompleted ? '#198038' : isActive ? '#0f62fe' : MODULE_COLORS[i + 1] || '#0f62fe';
-
-          return (
-            <React.Fragment key={mod.id}>
-              {i > 0 && (
-                <div className={`roadmap-connector ${isCompleted ? 'done' : isActive ? 'active' : ''}`} />
-              )}
-              <div
-                className={`roadmap-node ${isCompleted ? 'completed' : isActive ? 'active' : ''}`}
-                onClick={() => navigate(`/module/${mod.id}`)}
-                onMouseEnter={(e) => handleMouseEnter(mod, i, e)}
-                onMouseLeave={handleMouseLeave}
-              >
-                <div className="roadmap-step-number">{i + 1}</div>
-                <div className="roadmap-circle" style={{ background: nodeColor }}>
-                  {isCompleted ? (
-                    <span className="material-icons-round" style={{ fontSize: 24, color: '#fff' }}>check</span>
-                  ) : (
-                    <span className="material-icons-round" style={{ fontSize: 24, color: '#fff' }}>{MODULE_ICONS[i + 1]}</span>
-                  )}
-                  {isActive && (
-                    <svg className="roadmap-progress-ring" viewBox="0 0 60 60">
-                      <circle cx="30" cy="30" r="27" fill="none" stroke="rgba(255,255,255,0.2)" strokeWidth="3" />
-                      <circle cx="30" cy="30" r="27" fill="none" stroke="#fff" strokeWidth="3"
-                        strokeDasharray={`${2 * Math.PI * 27}`}
-                        strokeDashoffset={`${2 * Math.PI * 27 * (1 - pct / 100)}`}
-                        strokeLinecap="round"
-                        style={{ transform: 'rotate(-90deg)', transformOrigin: 'center' }}
-                      />
-                    </svg>
-                  )}
-                </div>
-                <div className="roadmap-label">{mod.title}</div>
-                {pct > 0 && <div className="roadmap-pct">{pct}%</div>}
-              </div>
-            </React.Fragment>
-          );
-        })}
-
-        {/* Final Exam node */}
-        <div className="roadmap-connector" />
-        <div
-          className="roadmap-node exam"
-          onClick={() => navigate('/exam')}
-          onMouseEnter={(e) => {
-            const rect = e.currentTarget.getBoundingClientRect();
-            setPopupPos({ x: rect.left + rect.width / 2, y: rect.top });
-            setHoveredNode({ mod: { title: 'Final Exam', description: 'Complete all 6 modules and pass the final exam with 70% or higher to earn your AI in Agriculture certification badge.', duration_minutes: 30, lesson_count: 10 }, index: 6, pct: 0, isExam: true });
-          }}
-          onMouseLeave={handleMouseLeave}
-        >
-          <div className="roadmap-step-number">7</div>
-          <div className="roadmap-circle exam-circle">
-            <span className="material-icons-round" style={{ fontSize: 24, color: '#fff' }}>emoji_events</span>
+    <div className="expert-chat-card">
+      <div className="expert-chat-header" style={{ borderBottom: `3px solid ${persona.color}` }}>
+        <div className="expert-chat-avatar">
+          <img src={photoSrc} alt={persona.name} className="expert-chat-avatar-img"
+            onError={(e) => { e.target.style.display = 'none'; e.target.nextSibling.style.display = 'flex'; }} />
+          <div className="expert-chat-avatar-fallback" style={{ display: 'none', background: persona.color }}>
+            {persona.name.split(' ').map(n => n[0]).join('').slice(0, 2)}
           </div>
-          <div className="roadmap-label">Final Exam</div>
+          <div className="expert-chat-status-dot" />
+        </div>
+        <div className="expert-chat-info">
+          <h4 className="expert-chat-name">{persona.name}</h4>
+          <div className="expert-chat-role" style={{ color: persona.color }}>{persona.role}</div>
+          <div className="expert-chat-location">
+            <LocationIcon size={11} /> {persona.location}
+          </div>
         </div>
       </div>
 
-      {/* Hover popup overlay */}
-      {hoveredNode && (
-        <div className="roadmap-popup" style={{ animationName: 'roadmapPopIn' }}>
-          <div className="roadmap-popup-arrow" />
-          <div className="roadmap-popup-header">
-            <span className="roadmap-popup-num">{hoveredNode.isExam ? 'Final' : `Module ${hoveredNode.index + 1}`}</span>
-            <h4 className="roadmap-popup-title">{hoveredNode.mod.title}</h4>
+      <div className="expert-chat-meta">
+        <div className="expert-chat-expertise">
+          <span className="expert-chat-meta-label">Expertise:</span> {persona.expertise}
+        </div>
+        <div className="expert-chat-personality">
+          <span className="expert-chat-meta-label">Voice:</span> {persona.accent} accent &middot; {persona.personality.split(',')[0]}
+        </div>
+      </div>
+
+      {!isOpen ? (
+        <div className="expert-chat-preview">
+          <p className="expert-chat-greeting">"{persona.greeting}"</p>
+          <div className="expert-chat-topics">
+            {persona.sampleTopics.map((t, i) => (
+              <span key={i} className="expert-chat-topic-tag" style={{ borderColor: persona.color, color: persona.color }}>{t}</span>
+            ))}
           </div>
-          <p className="roadmap-popup-desc">{hoveredNode.mod.description?.substring(0, 120)}...</p>
-          <div className="roadmap-popup-meta">
-            <span><span className="material-icons-round" style={{ fontSize: 14 }}>schedule</span> {hoveredNode.mod.duration_minutes} min</span>
-            <span><span className="material-icons-round" style={{ fontSize: 14 }}>menu_book</span> {hoveredNode.mod.lesson_count} lessons</span>
-            {hoveredNode.pct > 0 && <span className="roadmap-popup-progress">{hoveredNode.pct}% done</span>}
+          <button className="btn btn-primary" style={{ width: '100%', justifyContent: 'center' }}
+            onClick={() => setIsOpen(true)}>
+            <BotIcon size={16} /> Start Conversation
+          </button>
+        </div>
+      ) : (
+        <div className="expert-chat-conversation">
+          <div className="expert-chat-messages">
+            {messages.map((msg, i) => (
+              <div key={i} className={`expert-chat-message ${msg.role}`}>
+                {msg.role === 'assistant' && (
+                  <div className="expert-chat-msg-avatar" style={{ background: persona.color }}>
+                    {persona.name.split(' ').map(n => n[0]).join('').slice(0, 2)}
+                  </div>
+                )}
+                <div className={`expert-chat-msg-bubble ${msg.role}`}>
+                  {msg.text}
+                </div>
+              </div>
+            ))}
+            <div ref={messagesEndRef} />
           </div>
-          <div className="roadmap-popup-cta">
-            <span className="material-icons-round" style={{ fontSize: 14 }}>arrow_forward</span>
-            {hoveredNode.pct === 100 ? 'Review' : hoveredNode.pct > 0 ? 'Continue' : 'Start'}
+          <div className="expert-chat-input-area">
+            <input
+              type="text"
+              className="expert-chat-input"
+              placeholder={`Ask ${persona.name.split(' ')[0]} a question...`}
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && handleSend()}
+            />
+            <button className="expert-chat-send" onClick={handleSend} disabled={!input.trim()}>
+              <SendIcon size={16} />
+            </button>
           </div>
         </div>
       )}
@@ -132,105 +230,301 @@ function JourneyRoadmap({ modules, getModProgress, navigate }) {
   );
 }
 
+// ── Full persona data with scenarios, linked to modules ──
+const PERSONAS = [
+  {
+    name: 'Khalid Al-Rashidi', role: 'AgriTech Director', location: 'Riyadh, Saudi Arabia', initial: 'KR', color: '#da1e28',
+    modules: [2, 4], industry: 'Desert Agriculture & Food Security',
+    bio: 'Khalid leads digital transformation at a major Saudi agricultural company focused on desert farming using controlled-environment agriculture and AI-driven water management under Vision 2030.',
+    scenario: 'Managing greenhouse operations in Riyadh\'s extreme heat, Khalid deployed AI-controlled climate systems and hydroponic sensors that reduced water consumption by 90% compared to traditional farming. His team now produces 15 tonnes of tomatoes per greenhouse cycle using only recycled water.',
+    challenge: 'How can AI and controlled-environment agriculture help arid nations achieve food security while conserving scarce water resources?',
+  },
+  {
+    name: 'Amara Johnson', role: 'Wheat Farmer', location: 'Kansas, USA', initial: 'AJ', color: '#198038',
+    modules: [1], industry: 'Large-scale Grain Farming',
+    bio: 'Amara is a 3rd-generation farmer managing 2,000 acres of wheat and sorghum. She values her family\'s farming intuition but is open to technology that can prove its worth in the field.',
+    scenario: 'When her GPS-guided tractor suggested variable-rate seeding based on soil analysis, Amara was skeptical. But after one season of 12% yield improvement, she became the biggest advocate for AI adoption in her county\'s farming cooperative.',
+    challenge: 'How can AI help experienced farmers make better decisions without replacing the intuition built over generations?',
+  },
+  {
+    name: 'Carlos Mendoza', role: 'Coffee Farmer', location: 'Huila, Colombia', initial: 'CM', color: '#0043ce',
+    modules: [2, 3], industry: 'Specialty Coffee Production',
+    bio: 'Carlos runs a mid-size specialty coffee farm in the Colombian highlands. He\'s embraced IoT sensors and drone imaging to monitor his shade-grown Arabica plants and optimize harvest timing.',
+    scenario: 'Using soil moisture sensors and a weather prediction model, Carlos reduced his water usage by 30% while maintaining his farm\'s SCA cupping score above 85. His drone-captured multispectral images now detect coffee leaf rust 2 weeks before visible symptoms appear.',
+    challenge: 'Can precision sensing technology make specialty coffee farming both more sustainable and more profitable for smallholder farmers?',
+  },
+  {
+    name: 'Dr. Fatima Okafor', role: 'Agronomist', location: 'Lagos, Nigeria', initial: 'FO', color: '#8a3ffc',
+    modules: [3, 4], industry: 'Agricultural Advisory',
+    bio: 'Dr. Okafor advises 50 smallholder farms across southwestern Nigeria. She combines satellite monitoring with AI platforms to deliver personalized crop management recommendations.',
+    scenario: 'When flooding threatened her farmers\' cassava crops, Fatima used a satellite-based early warning system to issue 72-hour advance alerts. The farmers who followed her AI-guided drainage recommendations saved 85% of their harvest.',
+    challenge: 'How can AI-powered advisory services scale to help millions of smallholder farmers who lack internet connectivity and technical literacy?',
+  },
+  {
+    name: 'Rajan Patel', role: 'Food Distributor', location: 'Mumbai, India', initial: 'RP', color: '#007d79',
+    modules: [5, 6], industry: 'Agricultural Supply Chain',
+    bio: 'Rajan manages distribution of perishable goods across western India. He uses AI demand forecasting and IoT cold-chain monitoring to minimize food waste in a complex supply network.',
+    scenario: 'By implementing AI-powered demand prediction across 200 distribution points, Rajan reduced food waste by 40% and improved delivery freshness scores by 25%. His cold-chain sensors now trigger automatic rerouting when temperature anomalies are detected.',
+    challenge: 'Can AI transform agricultural supply chains in developing countries where infrastructure is fragmented and data is scarce?',
+  },
+];
+
+// ── Journey Roadmap with Overview as first node ──
+function JourneyRoadmap({ modules, getModProgress, navigate }) {
+  const [hoveredNode, setHoveredNode] = useState(null);
+  return (
+    <div className="roadmap-container">
+      <div className="roadmap-track">
+        {/* Overview node */}
+        <div className="roadmap-node completed"
+          onClick={() => navigate('/')}
+          onMouseEnter={() => setHoveredNode({ mod: { title: 'Course Overview', description: 'Static course information: structure, outcomes, skills, and university benchmarks.', duration_minutes: 10, lesson_count: 0 }, index: -1, pct: 100, isOverview: true })}
+          onMouseLeave={() => setHoveredNode(null)}>
+          <div className="roadmap-step-number">Start</div>
+          <div className="roadmap-circle" style={{ background: 'var(--interactive-primary)', borderColor: 'var(--interactive-primary)' }}>
+            <InformationIcon size={18} color="#fff" />
+          </div>
+          <div className="roadmap-label">Overview</div>
+        </div>
+        <div className="roadmap-connector done" />
+
+        {modules.map((mod, i) => {
+          const pct = getModProgress(mod.id);
+          const isCompleted = pct === 100;
+          const isActive = pct > 0 && pct < 100;
+          const IconComp = MODULE_ICONS[i + 1] || SproutIcon;
+          return (
+            <React.Fragment key={mod.id}>
+              {i > 0 && <div className={`roadmap-connector ${isCompleted ? 'done' : isActive ? 'active' : ''}`} />}
+              <div className={`roadmap-node ${isCompleted ? 'completed' : isActive ? 'active' : ''}`}
+                onClick={() => navigate(`/module/${mod.id}`)}
+                onMouseEnter={() => setHoveredNode({ mod, index: i, pct })}
+                onMouseLeave={() => setHoveredNode(null)}>
+                <div className="roadmap-step-number">Module {i + 1}</div>
+                <div className="roadmap-circle">
+                  {isCompleted ? <CheckmarkIcon size={20} color="#fff" /> : <IconComp size={18} color={isActive ? '#fff' : 'var(--text-secondary)'} />}
+                </div>
+                <div className="roadmap-label">{mod.title}</div>
+                {pct > 0 && <div className="roadmap-pct">{pct}%</div>}
+              </div>
+            </React.Fragment>
+          );
+        })}
+        <div className="roadmap-connector" />
+        <div className="roadmap-node exam" onClick={() => navigate('/exam')} onMouseEnter={() => setHoveredNode({ mod: { title: 'Final Exam', description: 'Pass with 70% to earn your certification badge.', duration_minutes: 30, lesson_count: 10 }, index: 6, pct: 0, isExam: true })} onMouseLeave={() => setHoveredNode(null)}>
+          <div className="roadmap-step-number">Final</div>
+          <div className="roadmap-circle exam-circle"><TrophyIcon size={20} color="#161616" /></div>
+          <div className="roadmap-label">Final Exam</div>
+        </div>
+      </div>
+      {hoveredNode && (
+        <div className="roadmap-popup" style={{ animationName: 'roadmapPopIn' }}>
+          <div className="roadmap-popup-arrow" />
+          <div className="roadmap-popup-header">
+            <span className="roadmap-popup-num">{hoveredNode.isExam ? 'Final' : hoveredNode.isOverview ? 'Start' : `Module ${hoveredNode.index + 1}`}</span>
+            <h4 className="roadmap-popup-title">{hoveredNode.mod.title}</h4>
+          </div>
+          <p className="roadmap-popup-desc">{hoveredNode.mod.description?.substring(0, 120)}...</p>
+          {!hoveredNode.isOverview && (
+            <div className="roadmap-popup-meta">
+              <span><TimeIcon size={14} /> {hoveredNode.mod.duration_minutes} min</span>
+              <span><CatalogIcon size={14} /> {hoveredNode.mod.lesson_count} lessons</span>
+            </div>
+          )}
+          <div className="roadmap-popup-cta"><ArrowRightIcon size={14} /> {hoveredNode.isOverview ? 'View' : hoveredNode.pct === 100 ? 'Review' : hoveredNode.pct > 0 ? 'Continue' : 'Start'}</div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ── Full-Screen Persona Carousel ──
+function PersonaShowcase() {
+  const [current, setCurrent] = useState(0);
+  const p = PERSONAS[current];
+  return (
+    <div className="persona-showcase">
+      <div className="persona-card-full">
+        <div className="persona-card-header" style={{ borderLeft: `4px solid ${p.color}` }}>
+          <div className="persona-avatar-initial" style={{ background: p.color }}>{p.initial}</div>
+          <div>
+            <h3 className="persona-full-name">{p.name}</h3>
+            <div className="persona-full-role">{p.role}</div>
+            <div className="persona-full-location"><LocationIcon size={14} /> {p.location}</div>
+          </div>
+          <div className="persona-full-industry">{p.industry}</div>
+        </div>
+
+        <div className="persona-card-body">
+          <p className="persona-full-bio">{p.bio}</p>
+
+          <div className="persona-scenario-block">
+            <div className="persona-scenario-label">Real-World Scenario</div>
+            <p className="persona-scenario-text">{p.scenario}</p>
+          </div>
+
+          <div className="persona-challenge-block">
+            <AiModelIcon size={18} color="var(--interactive-primary)" />
+            <p className="persona-challenge-text">{p.challenge}</p>
+          </div>
+
+          <div className="persona-modules-tags">
+            <span className="persona-tag-label">Featured in:</span>
+            {p.modules.map(m => (
+              <span key={m} className="persona-module-tag" style={{ borderColor: MODULE_COLORS[m], color: MODULE_COLORS[m] }}>
+                Module {m}
+              </span>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Dot navigation */}
+      <div className="persona-nav">
+        <button className="persona-nav-arrow" onClick={() => setCurrent(c => (c - 1 + PERSONAS.length) % PERSONAS.length)} aria-label="Previous persona"><ChevronLeftIcon size={20} /></button>
+        <div className="persona-dots">
+          {PERSONAS.map((per, i) => (
+            <button key={i} className={`persona-dot ${i === current ? 'active' : ''}`} style={i === current ? { background: per.color } : {}}
+              onClick={() => setCurrent(i)} title={per.name} />
+          ))}
+        </div>
+        <button className="persona-nav-arrow" onClick={() => setCurrent(c => (c + 1) % PERSONAS.length)} aria-label="Next persona"><ChevronRightIcon size={20} /></button>
+      </div>
+    </div>
+  );
+}
+
+// ── Main Dashboard — Dynamic Progress Only ──
 export default function Dashboard() {
   const [course, setCourse] = useState(null);
   const [modules, setModules] = useState([]);
-  const { progress, user } = useContext(AppContext);
+  const { progress } = useContext(AppContext);
   const navigate = useNavigate();
 
   useEffect(() => {
-    fetch('/api/course').then(r => r.json()).then(data => {
-      setCourse(data.course);
-      setModules(data.modules);
-    }).catch(console.error);
+    fetch('/api/course').then(r => r.json()).then(data => { setCourse(data.course); setModules(data.modules); }).catch(console.error);
   }, []);
 
   const getModProgress = (modId) => {
     if (!progress?.moduleProgress) return 0;
-    const mp = progress.moduleProgress.find(m => m.module_id === modId);
-    return mp?.percentage || 0;
+    return progress.moduleProgress.find(m => m.module_id === modId)?.percentage || 0;
   };
+
+  // Calculate overall stats
+  const totalLessons = modules.reduce((sum, m) => sum + (m.lesson_count || 0), 0);
+  const completedLessons = progress?.progress?.filter(p => p.status === 'completed')?.length || 0;
+  const overallPct = progress?.overallPercentage || 0;
+  const totalTimeSpent = progress?.progress?.reduce((sum, p) => sum + (p.time_spent || 0), 0) || 0;
+  const timeMinutes = Math.round(totalTimeSpent / 60);
+  const modulesCompleted = modules.filter(m => getModProgress(m.id) === 100).length;
 
   if (!course) return (
     <div className="main-content" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '60vh' }}>
       <div style={{ textAlign: 'center' }}>
-        <span className="material-icons-round" style={{ fontSize: 48, color: 'var(--interactive-primary)', animation: 'pulse 2s infinite' }}>eco</span>
-        <p style={{ marginTop: 16, color: 'var(--text-tertiary)' }}>Loading course...</p>
+        <EcoIcon size={48} color="var(--interactive-primary)" style={{ animation: 'pulse 2s infinite' }} />
+        <p style={{ marginTop: 'var(--spacing-05)', color: 'var(--text-tertiary)' }}>Loading dashboard...</p>
       </div>
     </div>
   );
 
   return (
     <div className="main-content">
-      {/* Hero */}
-      <div className="hero-section">
-        <div className="hero-bg" style={{ backgroundImage: `url(/images/hero-landing.png)` }} />
-        <div className="hero-overlay" />
-        <div className="hero-content">
-          <div className="hero-badge">
-            <span className="material-icons-round" style={{ fontSize: 12 }}>verified</span>
-            Benchmarked Against Top Universities
+      {/* Progress Overview Header */}
+      <div className="dash-header">
+        <div>
+          <div className="section-label">Your Progress</div>
+          <h2 className="section-title">Learning Dashboard</h2>
+          <p className="section-desc">Track your progress, see what you've completed, and continue where you left off.</p>
+        </div>
+        <button className="btn btn-secondary" onClick={() => navigate('/')}>
+          <InformationIcon size={16} />
+          Course Overview
+        </button>
+      </div>
+
+      {/* Stats Cards */}
+      <div className="dash-stats-grid">
+        <div className="dash-stat-card">
+          <div className="dash-stat-value" style={{ color: 'var(--interactive-primary)' }}>{overallPct}%</div>
+          <div className="dash-stat-label">Overall Progress</div>
+          <div className="progress-bar-container" style={{ marginTop: 'var(--spacing-03)' }}>
+            <div className="progress-bar-fill" style={{ width: `${overallPct}%`, background: overallPct === 100 ? 'var(--support-success)' : 'var(--interactive-primary)' }} />
           </div>
-          <h1 className="hero-title">
-            <strong>AI</strong> in Agriculture:<br />
-            From Field to <strong>Future</strong>
-          </h1>
-          <p className="hero-subtitle">{course.description?.substring(0, 200)}...</p>
-          <div className="hero-stats">
-            <div className="hero-stat"><div className="hero-stat-value">5h</div><div className="hero-stat-label">Total Content</div></div>
-            <div className="hero-stat"><div className="hero-stat-value">6</div><div className="hero-stat-label">Modules</div></div>
-            <div className="hero-stat"><div className="hero-stat-value">36</div><div className="hero-stat-label">Lessons</div></div>
-            <div className="hero-stat"><div className="hero-stat-value">{progress?.overallPercentage || 0}%</div><div className="hero-stat-label">Complete</div></div>
-          </div>
+        </div>
+        <div className="dash-stat-card">
+          <div className="dash-stat-value">{completedLessons}<span className="dash-stat-of">/{totalLessons}</span></div>
+          <div className="dash-stat-label">Lessons Completed</div>
+        </div>
+        <div className="dash-stat-card">
+          <div className="dash-stat-value">{modulesCompleted}<span className="dash-stat-of">/6</span></div>
+          <div className="dash-stat-label">Modules Completed</div>
+        </div>
+        <div className="dash-stat-card">
+          <div className="dash-stat-value">{timeMinutes}<span className="dash-stat-of">min</span></div>
+          <div className="dash-stat-label">Time Invested</div>
         </div>
       </div>
 
-      {/* Journey Map - High Contrast Interactive Roadmap */}
+      {/* Journey Map */}
       <div className="section-header">
         <div className="section-label">Your Learning Journey</div>
         <h2 className="section-title">Course Roadmap</h2>
-        <p className="section-desc">Navigate through six comprehensive modules, each building on the last. Complete all modules and pass the final exam to earn your certification.</p>
+        <p className="section-desc">Navigate through six comprehensive modules. Complete all and pass the final exam to earn your certification.</p>
       </div>
-
       <JourneyRoadmap modules={modules} getModProgress={getModProgress} navigate={navigate} />
 
-      {/* Benchmarking Banner */}
-      <div className="benchmark-banner">
-        <div style={{ fontSize: '0.75rem', color: 'var(--interactive-primary)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 8, fontWeight: 400 }}>Benchmarked Against</div>
-        <p style={{ fontSize: '0.875rem', lineHeight: 1.43, color: 'var(--text-secondary)' }}>{course.benchmarked_from}</p>
-        <div style={{ display: 'flex', gap: 12, marginTop: 16, flexWrap: 'wrap' }}>
-          {['Wageningen University', 'Cornell University', 'UC Davis', 'McKinsey & Company', 'IBM Research', 'Microsoft Research', 'Google AI'].map(org => (
-            <span key={org} className="benchmark-tag">{org}</span>
-          ))}
-        </div>
-      </div>
-
-      {/* Module Cards */}
+      {/* Module Progress Cards — Dynamic with images */}
       <div className="section-header">
-        <div className="section-label">Modules</div>
-        <h2 className="section-title">Course Modules</h2>
+        <div className="section-label">Module Progress</div>
+        <h2 className="section-title">Your Modules</h2>
       </div>
-
-      <div className="module-grid stagger-children">
+      <div className="module-wide-grid stagger-children">
         {modules.map((mod, i) => {
           const pct = getModProgress(mod.id);
+          const IconComp = MODULE_ICONS[i + 1] || SproutIcon;
+          const imgSrc = MODULE_IMAGES[i + 1];
+          const lessonsDone = progress?.moduleProgress?.find(m => m.module_id === mod.id)?.completed || 0;
+          const desc = MODULE_DESCRIPTIONS[i + 1] || mod.description;
+          const topics = MODULE_TOPICS[i + 1] || [];
           return (
-            <div key={mod.id} className="card module-card" onClick={() => navigate(`/module/${mod.id}`)}>
-              <SafeImage className="module-card-image" src={mod.image_url} alt={mod.title} fallbackIcon="school" />
-              <div className="module-card-accent" style={{ background: mod.color }} />
-              <div className="module-card-body">
-                <div className="module-card-number">Module {mod.order_index}</div>
-                <h3 className="module-card-title">{mod.title}</h3>
-                <p className="module-card-desc">{mod.description}</p>
-                <div style={{ marginBottom: 12 }}>
-                  <div className="progress-bar-container">
-                    <div className="progress-bar-fill" style={{ width: `${pct}%`, background: mod.color }} />
+            <div key={mod.id} className="card module-wide-card" onClick={() => navigate(`/module/${mod.id}`)}>
+              <div className="module-wide-image">
+                <img src={imgSrc} alt={mod.title} className="module-wide-img" loading="lazy"
+                  onError={(e) => { e.target.style.display = 'none'; e.target.nextSibling.style.display = 'flex'; }} />
+                <div className="module-wide-img-fallback" style={{ display: 'none' }}>
+                  <IconComp size={40} color="var(--interactive-primary)" />
+                </div>
+                <div className="module-wide-accent" style={{ background: MODULE_COLORS[i + 1] }} />
+              </div>
+              <div className="module-wide-body">
+                <div className="module-wide-header">
+                  <div>
+                    <div className="module-card-number">Module {mod.order_index}</div>
+                    <h3 className="module-card-title">{mod.title}</h3>
                   </div>
-                  <div style={{ fontSize: '0.75rem', color: 'var(--text-tertiary)', marginTop: 4, fontWeight: 400 }}>{pct}% complete</div>
+                  <div className="module-wide-status">
+                    {pct === 100 ? <><CheckmarkFilledIcon size={16} color="var(--support-success)" /> <span style={{ color: 'var(--support-success)', fontWeight: 600 }}>Done</span></> :
+                     pct > 0 ? <span style={{ color: 'var(--interactive-primary)', fontWeight: 600 }}>In Progress</span> : <span style={{ color: 'var(--text-tertiary)' }}>Not Started</span>}
+                  </div>
+                </div>
+                <p className="module-wide-desc">{desc}</p>
+                <div className="module-wide-topics">
+                  {topics.map((t, ti) => (
+                    <span key={ti} className="module-wide-topic-tag">{t}</span>
+                  ))}
+                </div>
+                <div style={{ marginBottom: 'var(--spacing-04)' }}>
+                  <div className="progress-bar-container">
+                    <div className="progress-bar-fill" style={{ width: `${pct}%`, background: pct === 100 ? 'var(--support-success)' : 'var(--interactive-primary)' }} />
+                  </div>
+                  <div style={{ fontSize: '0.75rem', color: 'var(--text-tertiary)', marginTop: 'var(--spacing-01)', display: 'flex', justifyContent: 'space-between' }}>
+                    <span>{pct}% complete</span>
+                    <span>{lessonsDone}/{mod.lesson_count} lessons</span>
+                  </div>
                 </div>
                 <div className="module-card-meta">
-                  <span><span className="material-icons-round" style={{ fontSize: 14 }}>schedule</span> {mod.duration_minutes} min</span>
-                  <span><span className="material-icons-round" style={{ fontSize: 14 }}>menu_book</span> {mod.lesson_count} lessons</span>
+                  <span><TimeIcon size={14} /> {mod.duration_minutes} min</span>
+                  <span><CatalogIcon size={14} /> {mod.lesson_count} lessons</span>
                 </div>
               </div>
             </div>
@@ -238,62 +532,18 @@ export default function Dashboard() {
         })}
       </div>
 
-      {/* Personas Section - Realistic AI-Generated People */}
-      <div className="section-header" style={{ marginTop: 'var(--spacing-09)' }}>
-        <div className="section-label">Meet Your Guides</div>
-        <h2 className="section-title">Learning Personas</h2>
-        <p className="section-desc">Throughout this course, you'll follow four agricultural professionals as they discover how AI transforms their work.</p>
-      </div>
-
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 'var(--spacing-06)', marginBottom: 'var(--spacing-09)' }}>
-        {[
-          { name: 'Amara Johnson', role: 'Wheat Farmer, Kansas', image: PERSONA_IMAGES.amara, color: '#f1c21b', desc: '3rd-generation farmer managing 2,000 acres. Tech-curious but values decades of farming intuition.' },
-          { name: 'Carlos Mendoza', role: 'Coffee Farmer, Colombia', image: PERSONA_IMAGES.carlos, color: '#198038', desc: 'Progressive mid-size farmer embracing IoT sensors and drone technology for specialty coffee.' },
-          { name: 'Dr. Fatima Okafor', role: 'Agronomist, Nigeria', image: PERSONA_IMAGES.fatima, color: '#0f62fe', desc: 'Advises 50 smallholder farms on sustainable practices using AI platforms and satellite monitoring.' },
-          { name: 'Rajan Patel', role: 'Food Distributor, India', image: PERSONA_IMAGES.rajan, color: '#8a3ffc', desc: 'Manages perishable goods distribution. Uses AI demand forecasting to slash food waste.' }
-        ].map(p => (
-          <div key={p.name} className="persona-dashboard-card">
-            <div style={{ display: 'flex', gap: 16, alignItems: 'center', marginBottom: 14 }}>
-              <img
-                src={p.image}
-                alt={p.name}
-                className="persona-dashboard-avatar"
-                style={{ borderColor: p.color }}
-                onError={(e) => { e.target.style.display = 'none'; e.target.nextSibling.style.display = 'flex'; }}
-              />
-              <div style={{ width: 72, height: 72, borderRadius: '50%', background: p.color, display: 'none', alignItems: 'center', justifyContent: 'center', fontSize: 28, color: 'white', flexShrink: 0, border: `3px solid ${p.color}` }}>
-                {p.name[0]}
-              </div>
-              <div>
-                <div className="persona-dashboard-name">{p.name}</div>
-                <div className="persona-dashboard-role" style={{ color: p.color }}>{p.role}</div>
-              </div>
-            </div>
-            <p className="persona-dashboard-desc">{p.desc}</p>
-          </div>
-        ))}
-      </div>
-
-      {/* Features */}
+      {/* 1-1 Conversations with Digital Experts */}
       <div className="section-header">
-        <div className="section-label">Course Tools</div>
-        <h2 className="section-title">Interactive Learning Features</h2>
+        <div className="section-label">Expert Conversations</div>
+        <h2 className="section-title">1-1 Conversations with Our Digital Experts</h2>
+        <p className="section-desc">
+          Engage directly with our five Learning Personas. Each expert has a unique voice, accent, personality,
+          and deep expertise aligned to their country and course topics. Start a conversation to learn from their real-world experience.
+        </p>
       </div>
-
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(256px, 1fr))', gap: 'var(--spacing-06)', marginBottom: 'var(--spacing-09)' }}>
-        {[
-          { icon: 'smart_toy', title: 'Noor AI Assistant', desc: 'Chat with Noor anytime to dive deeper into topics, ask questions, or generate complementary materials.', color: '#0f62fe' },
-          { icon: 'sports_esports', title: 'Mini-Games', desc: 'Engage with interactive games — from piloting drones to diagnosing crop diseases.', color: '#a56eff' },
-          { icon: 'psychology', title: 'Scenario Checkpoints', desc: 'Use-case-based assessments where you apply AI to real agricultural challenges.', color: '#007d79' },
-          { icon: 'terminal', title: 'AI Prompts to Try', desc: 'Real prompts you can test on OpenAI, Perplexity, and other platforms right now.', color: '#ee5396' },
-          { icon: 'play_circle', title: 'Curated Videos', desc: 'Expert interviews from IBM researchers, university professors, and industry leaders.', color: '#da1e28' },
-          { icon: 'emoji_events', title: 'Graduation Badge', desc: 'Complete the course and pass the final exam to earn a shareable digital credential.', color: '#f1c21b' }
-        ].map(f => (
-          <div key={f.title} className="feature-card">
-            <span className="material-icons-round" style={{ fontSize: 32, color: f.color, marginBottom: 12, display: 'block' }}>{f.icon}</span>
-            <h4 style={{ fontSize: '0.875rem', marginBottom: 8, fontWeight: 600, color: 'var(--text-primary)' }}>{f.title}</h4>
-            <p style={{ fontSize: '0.875rem', lineHeight: 1.43 }}>{f.desc}</p>
-          </div>
+      <div className="expert-chat-grid">
+        {PERSONA_CHAT_CONFIG.map((p, i) => (
+          <ExpertChatCard key={i} persona={p} />
         ))}
       </div>
     </div>
