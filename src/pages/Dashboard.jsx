@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext, useRef } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AppContext } from '../App';
 import {
@@ -114,43 +114,9 @@ const PERSONA_CHAT_CONFIG = [
   },
 ];
 
-// ── 1-1 Expert Chat Card ──
-function ExpertChatCard({ persona }) {
-  const [messages, setMessages] = useState([
-    { role: 'assistant', text: persona.greeting },
-  ]);
-  const [input, setInput] = useState('');
-  const [isOpen, setIsOpen] = useState(false);
-  const messagesEndRef = useRef(null);
+// ── Expert Info Card (display-only — chat via bottom-right persona selector) ──
+function ExpertInfoCard({ persona }) {
   const photoSrc = PERSONA_PHOTOS[persona.name];
-
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  };
-
-  useEffect(() => {
-    if (isOpen) scrollToBottom();
-  }, [messages, isOpen]);
-
-  const handleSend = () => {
-    if (!input.trim()) return;
-    const userMsg = input.trim();
-    setMessages(prev => [...prev, { role: 'user', text: userMsg }]);
-    setInput('');
-
-    // Simulate expert response
-    setTimeout(() => {
-      const responses = [
-        `Great question! In my experience working in ${persona.location}, I've found that ${userMsg.toLowerCase().includes('ai') ? 'AI tools' : 'technology'} can transform how we approach this challenge.`,
-        `That's something I deal with every day. As a ${persona.role}, I've seen firsthand how the right approach makes all the difference. Let me explain...`,
-        `Interesting! This relates directly to what we cover in our course modules on ${persona.expertise.split(',')[0]}. The key insight is that practical application matters most.`,
-      ];
-      setMessages(prev => [...prev, {
-        role: 'assistant',
-        text: responses[Math.floor(Math.random() * responses.length)],
-      }]);
-    }, 800 + Math.random() * 1200);
-  };
 
   return (
     <div className="expert-chat-card">
@@ -181,51 +147,18 @@ function ExpertChatCard({ persona }) {
         </div>
       </div>
 
-      {!isOpen ? (
-        <div className="expert-chat-preview">
-          <p className="expert-chat-greeting">"{persona.greeting}"</p>
-          <div className="expert-chat-topics">
-            {persona.sampleTopics.map((t, i) => (
-              <span key={i} className="expert-chat-topic-tag" style={{ borderColor: persona.color, color: persona.color }}>{t}</span>
-            ))}
-          </div>
-          <button className="btn btn-primary" style={{ width: '100%', justifyContent: 'center' }}
-            onClick={() => setIsOpen(true)}>
-            <BotIcon size={16} /> Start Conversation
-          </button>
+      <div className="expert-chat-preview">
+        <p className="expert-chat-greeting">"{persona.greeting}"</p>
+        <div className="expert-chat-topics">
+          {persona.sampleTopics.map((t, i) => (
+            <span key={i} className="expert-chat-topic-tag" style={{ borderColor: persona.color, color: persona.color }}>{t}</span>
+          ))}
         </div>
-      ) : (
-        <div className="expert-chat-conversation">
-          <div className="expert-chat-messages">
-            {messages.map((msg, i) => (
-              <div key={i} className={`expert-chat-message ${msg.role}`}>
-                {msg.role === 'assistant' && (
-                  <div className="expert-chat-msg-avatar" style={{ background: persona.color }}>
-                    {persona.name.split(' ').map(n => n[0]).join('').slice(0, 2)}
-                  </div>
-                )}
-                <div className={`expert-chat-msg-bubble ${msg.role}`}>
-                  {msg.text}
-                </div>
-              </div>
-            ))}
-            <div ref={messagesEndRef} />
-          </div>
-          <div className="expert-chat-input-area">
-            <input
-              type="text"
-              className="expert-chat-input"
-              placeholder={`Ask ${persona.name.split(' ')[0]} a question...`}
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && handleSend()}
-            />
-            <button className="expert-chat-send" onClick={handleSend} disabled={!input.trim()}>
-              <SendIcon size={16} />
-            </button>
-          </div>
+        <div className="expert-chat-cta-hint">
+          <BotIcon size={14} />
+          <span>Use the <strong>AI persona selector</strong> (bottom-right) to chat with {persona.name.split(' ')[0]}</span>
         </div>
-      )}
+      </div>
     </div>
   );
 }
@@ -394,6 +327,30 @@ function PersonaShowcase() {
   );
 }
 
+// ── Continue Learning logic ──
+function getContinueTarget(modules, progress) {
+  if (!progress?.moduleProgress || !modules.length) return { url: '/module/' + modules[0]?.id, label: 'Start Learning', hasStarted: false, moduleName: modules[0]?.title || 'Module 1', moduleNum: 1 };
+
+  const sorted = [...progress.moduleProgress].sort((a, b) => a.module_order - b.module_order);
+
+  // Find first module that is in progress (> 0% and < 100%)
+  const inProgress = sorted.find(m => m.percentage > 0 && m.percentage < 100);
+  if (inProgress) {
+    return { url: `/module/${inProgress.module_id}`, label: 'Continue Learning', hasStarted: true, moduleName: inProgress.module_title, moduleNum: inProgress.module_order, pct: inProgress.percentage };
+  }
+
+  // Find first module not yet started (0%)
+  const notStarted = sorted.find(m => m.percentage === 0);
+  if (notStarted) {
+    // If ANY modules have been completed, this is "Continue" not "Start"
+    const anyCompleted = sorted.some(m => m.percentage === 100);
+    return { url: `/module/${notStarted.module_id}`, label: anyCompleted ? 'Continue Learning' : 'Start Learning', hasStarted: anyCompleted, moduleName: notStarted.module_title, moduleNum: notStarted.module_order, pct: 0 };
+  }
+
+  // All modules completed → go to exam
+  return { url: '/exam', label: 'Take Final Exam', hasStarted: true, moduleName: 'Final Exam', moduleNum: null, pct: 100, allComplete: true };
+}
+
 // ── Main Dashboard — Dynamic Progress Only ──
 export default function Dashboard() {
   const [course, setCourse] = useState(null);
@@ -418,6 +375,9 @@ export default function Dashboard() {
   const timeMinutes = Math.round(totalTimeSpent / 60);
   const modulesCompleted = modules.filter(m => getModProgress(m.id) === 100).length;
 
+  // Continue learning target
+  const continueTarget = getContinueTarget(modules, progress);
+
   if (!course) return (
     <div className="main-content" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '60vh' }}>
       <div style={{ textAlign: 'center' }}>
@@ -436,10 +396,36 @@ export default function Dashboard() {
           <h2 className="section-title">Learning Dashboard</h2>
           <p className="section-desc">Track your progress, see what you've completed, and continue where you left off.</p>
         </div>
-        <button className="btn btn-secondary" onClick={() => navigate('/')}>
-          <InformationIcon size={16} />
-          Course Overview
-        </button>
+        <div className="dash-header-right">
+          {course?.version && <span className="dash-version-badge">v{course.version}</span>}
+          <button className="btn btn-secondary" onClick={() => navigate('/')}>
+            <InformationIcon size={16} />
+            Course Overview
+          </button>
+        </div>
+      </div>
+
+      {/* Continue Learning Hero CTA */}
+      <div className="dash-continue-hero" onClick={() => navigate(continueTarget.url)}>
+        <div className="dash-continue-left">
+          <div className="dash-continue-icon">
+            {continueTarget.allComplete ? <TrophyIcon size={32} color="#fff" /> :
+             continueTarget.hasStarted ? <PlayFilledIcon size={32} color="#fff" /> :
+             <ArrowRightIcon size={32} color="#fff" />}
+          </div>
+          <div className="dash-continue-text">
+            <h3 className="dash-continue-label">{continueTarget.label}</h3>
+            <p className="dash-continue-module">
+              {continueTarget.allComplete ? 'All modules completed — earn your certificate!' :
+               continueTarget.moduleNum ? `Module ${continueTarget.moduleNum}: ${continueTarget.moduleName}` :
+               continueTarget.moduleName}
+              {continueTarget.pct > 0 && continueTarget.pct < 100 && ` — ${continueTarget.pct}% done`}
+            </p>
+          </div>
+        </div>
+        <div className="dash-continue-arrow">
+          <ArrowRightIcon size={28} />
+        </div>
       </div>
 
       {/* Stats Cards */}
@@ -534,16 +520,18 @@ export default function Dashboard() {
 
       {/* 1-1 Conversations with Digital Experts */}
       <div className="section-header">
-        <div className="section-label">Expert Conversations</div>
-        <h2 className="section-title">1-1 Conversations with Our Digital Experts</h2>
+        <div className="section-label">AI-Powered Expert Conversations</div>
+        <h2 className="section-title">Meet Our Digital Experts</h2>
         <p className="section-desc">
-          Engage directly with our five Learning Personas. Each expert has a unique voice, accent, personality,
-          and deep expertise aligned to their country and course topics. Start a conversation to learn from their real-world experience.
+          Our five Learning Personas are <strong>AI-generated agents</strong>, each with a unique voice, accent, personality,
+          and deep expertise aligned to their country and course topics. These agents are powered by OpenAI
+          and respond in character based on their professional background.
+          To chat with any expert, use the <strong>AI persona selector</strong> button at the bottom-right of your screen.
         </p>
       </div>
       <div className="expert-chat-grid">
         {PERSONA_CHAT_CONFIG.map((p, i) => (
-          <ExpertChatCard key={i} persona={p} />
+          <ExpertInfoCard key={i} persona={p} />
         ))}
       </div>
     </div>
