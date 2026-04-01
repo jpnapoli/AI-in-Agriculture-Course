@@ -14,30 +14,47 @@ function AppProvider({ children }) {
   const [theme, setTheme] = useState('dark');
   const [user, setUser] = useState(null);
   const [progress, setProgress] = useState(null);
+  const [activePersona, setActivePersona] = useState(null); // Noor persona skin
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
   }, [theme]);
 
   useEffect(() => {
+    // Always validate user against backend to handle DB resets
     const saved = localStorage.getItem('agri-ai-user');
-    if (saved) {
-      setUser(JSON.parse(saved));
-    } else {
-      const u = { id: 'user-' + Date.now(), name: 'Learner', email: 'learner@course.ai' };
-      fetch('/api/users', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(u) })
-        .then(r => r.json()).then(data => { setUser(data); localStorage.setItem('agri-ai-user', JSON.stringify(data)); })
-        .catch(() => { setUser(u); localStorage.setItem('agri-ai-user', JSON.stringify(u)); });
-    }
+    const email = saved ? JSON.parse(saved).email : 'learner@course.ai';
+    const name = saved ? JSON.parse(saved).name : 'Learner';
+    fetch('/api/users', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name, email })
+    })
+      .then(r => r.json())
+      .then(data => {
+        setUser(data);
+        localStorage.setItem('agri-ai-user', JSON.stringify(data));
+      })
+      .catch(() => {
+        // Offline fallback: use saved or generate temporary
+        if (saved) {
+          setUser(JSON.parse(saved));
+        } else {
+          const u = { id: 'user-' + Date.now(), name: 'Learner', email: 'learner@course.ai' };
+          setUser(u);
+          localStorage.setItem('agri-ai-user', JSON.stringify(u));
+        }
+      });
   }, []);
 
-  const refreshProgress = async () => {
-    if (!user) return;
+  const refreshProgress = async (overrideUser) => {
+    const u = overrideUser || user;
+    if (!u) return;
     try {
-      const r = await fetch(`/api/users/${user.id}/progress`);
+      const r = await fetch(`/api/users/${u.id}/progress`);
       const data = await r.json();
       setProgress(data);
-    } catch (e) { console.error(e); }
+    } catch (e) { console.error('refreshProgress error:', e); }
   };
 
   useEffect(() => { if (user) refreshProgress(); }, [user]);
@@ -45,7 +62,7 @@ function AppProvider({ children }) {
   const toggleTheme = () => setTheme(t => t === 'dark' ? 'light' : 'dark');
 
   return (
-    <AppContext.Provider value={{ theme, toggleTheme, user, progress, refreshProgress }}>
+    <AppContext.Provider value={{ theme, toggleTheme, user, progress, refreshProgress, activePersona, setActivePersona }}>
       {children}
     </AppContext.Provider>
   );

@@ -12,63 +12,120 @@ import {
   TerminalIcon, PlayFilledIcon,
 } from '../components/CarbonIcons';
 
+// University logo components — simple branded SVG marks
+function UniLogo({ uni, size = 36 }) {
+  const s = size;
+  const logos = {
+    wageningen: (
+      <svg viewBox="0 0 40 40" width={s} height={s} aria-label="Wageningen University">
+        <rect width="40" height="40" rx="6" fill="#00a6d6" />
+        <text x="20" y="16" textAnchor="middle" fill="#fff" fontSize="11" fontWeight="700" fontFamily="Arial,sans-serif">WUR</text>
+        <rect x="8" y="20" width="24" height="2" rx="1" fill="rgba(255,255,255,0.6)" />
+        <text x="20" y="33" textAnchor="middle" fill="rgba(255,255,255,0.8)" fontSize="7" fontFamily="Arial,sans-serif">Wageningen</text>
+      </svg>
+    ),
+    cornell: (
+      <svg viewBox="0 0 40 40" width={s} height={s} aria-label="Cornell University">
+        <rect width="40" height="40" rx="6" fill="#B31B1B" />
+        <text x="20" y="24" textAnchor="middle" fill="#fff" fontSize="9" fontWeight="700" fontFamily="Georgia,serif">CORNELL</text>
+        <rect x="8" y="28" width="24" height="1.5" rx="0.75" fill="rgba(255,255,255,0.4)" />
+      </svg>
+    ),
+    ucdavis: (
+      <svg viewBox="0 0 40 40" width={s} height={s} aria-label="UC Davis">
+        <rect width="40" height="40" rx="6" fill="#002855" />
+        <text x="20" y="16" textAnchor="middle" fill="#DAAA00" fontSize="10" fontWeight="700" fontFamily="Arial,sans-serif">UC</text>
+        <text x="20" y="29" textAnchor="middle" fill="#fff" fontSize="9" fontWeight="600" fontFamily="Arial,sans-serif">DAVIS</text>
+      </svg>
+    ),
+    ethz: (
+      <svg viewBox="0 0 40 40" width={s} height={s} aria-label="ETH Zurich">
+        <rect width="40" height="40" rx="6" fill="#1F407A" />
+        <text x="20" y="18" textAnchor="middle" fill="#fff" fontSize="12" fontWeight="700" fontFamily="Arial,sans-serif">ETH</text>
+        <text x="20" y="31" textAnchor="middle" fill="rgba(255,255,255,0.7)" fontSize="7" fontFamily="Arial,sans-serif">Zurich</text>
+      </svg>
+    ),
+    reading: (
+      <svg viewBox="0 0 40 40" width={s} height={s} aria-label="University of Reading">
+        <rect width="40" height="40" rx="6" fill="#621244" />
+        <text x="20" y="18" textAnchor="middle" fill="#fff" fontSize="8" fontWeight="600" fontFamily="Arial,sans-serif">UoR</text>
+        <text x="20" y="30" textAnchor="middle" fill="rgba(255,255,255,0.7)" fontSize="6" fontFamily="Arial,sans-serif">Reading</text>
+      </svg>
+    ),
+  };
+  return logos[uni] || null;
+}
+
 const BENCHMARK_UNIVERSITIES = [
   {
-    name: 'Wageningen University & Research', country: 'Netherlands', flag: '🇳🇱',
-    focus: 'Digital Agriculture & Precision Farming', match: 92,
-    url: 'https://www.wur.nl/en/education/master',
+    name: 'Wageningen University & Research', country: 'Netherlands', flag: '\u{1F1F3}\u{1F1F1}',
+    focus: 'Plant Sciences & Precision Farming', match: 92,
+    logo: 'wageningen',
+    url: 'https://www.wur.nl/en/education/master/masters-plant-sciences',
+    urlLabel: 'MSc Plant Sciences programme',
     courses: [
-      { name: 'Digital Agriculture', maps: [1, 2] },
-      { name: 'Precision Farming & Sensor Technology', maps: [2, 3] },
-      { name: 'Remote Sensing for Agriculture', maps: [2] },
-      { name: 'Climate-Smart Agriculture', maps: [4] },
+      { name: 'MSc Plant Sciences (specialisation tracks)', maps: [1, 3] },
+      { name: 'Precision Agriculture research group', maps: [2, 3] },
+      { name: 'AI, Robotics & Smart Cultivation Technologies', maps: [2, 6] },
+      { name: 'Climate-Smart Crop Systems', maps: [4] },
     ],
-    explanation: 'Wageningen scores 92% because our curriculum covers all four of their core digital agriculture themes — AI foundations, sensor-based monitoring, crop analytics, and climate resilience — and adds supply-chain and future-of-work modules they offer as electives.',
+    explanation: 'Wageningen scores 92% because our curriculum covers their core plant-science and precision agriculture themes — AI foundations, sensor-based monitoring, crop analytics, and climate resilience. Their MSc Plant Sciences programme offers five specialisation tracks from molecular labs to high-tech greenhouses.',
   },
   {
-    name: 'Cornell University', country: 'USA', flag: '🇺🇸',
-    focus: 'Agricultural Data Science & IoT', match: 88,
-    url: 'https://cals.cornell.edu/education/degrees/agricultural-sciences-ms-phd',
+    name: 'Cornell University', country: 'USA', flag: '\u{1F1FA}\u{1F1F8}',
+    focus: 'Digital Agriculture Minor (CIDA)', match: 88,
+    logo: 'cornell',
+    url: 'https://cals.cornell.edu/education/degrees-programs/digital-agriculture-minor',
+    urlLabel: 'Digital Agriculture Minor curriculum',
     courses: [
-      { name: 'Intro to Agricultural Data Science', maps: [1] },
-      { name: 'IoT for Agriculture', maps: [2] },
-      { name: 'Machine Learning for Crop Prediction', maps: [3] },
-      { name: 'Food Supply Chain Management', maps: [5] },
+      { name: 'ALS 1110 — Introduction to Digital Agriculture', maps: [1] },
+      { name: 'Data Science / Computer Science elective track', maps: [1, 3] },
+      { name: 'Remote Sensing & Modeling for Ecosystems (PLSCI 4290)', maps: [2] },
+      { name: 'Bio-Robotics & Food Safety Assurance electives', maps: [5, 6] },
     ],
-    explanation: 'Cornell scores 88% as we align with their data-science, IoT and supply-chain coursework. The gap is in advanced statistical modeling labs which they deliver in semester-long practicum format.',
+    explanation: 'Cornell scores 88% based on their Digital Agriculture Minor — a 16-18 credit cross-disciplinary programme designed by the Cornell Institute for Digital Agriculture (CIDA). Our course aligns with their data-science, sensing, ethics and ag-production coursework. The gap is in advanced statistical-modeling labs delivered in semester-long practicum format.',
   },
   {
-    name: 'UC Davis', country: 'USA', flag: '🇺🇸',
-    focus: 'Plant Sciences & AI Applications', match: 85,
-    url: 'https://www.ucdavis.edu/majors/agricultural-and-environmental-technology',
+    name: 'UC Davis', country: 'USA', flag: '\u{1F1FA}\u{1F1F8}',
+    focus: 'Precision Agriculture Minor', match: 85,
+    logo: 'ucdavis',
+    url: 'https://catalog.ucdavis.edu/departments-programs-degrees/biological-agricultural-engineering/precision-agriculture-minor/',
+    urlLabel: 'Precision Agriculture Minor catalogue',
     courses: [
-      { name: 'AI in Plant Pathology', maps: [3] },
-      { name: 'Environmental Sensing', maps: [2, 4] },
-      { name: 'Sustainable Food Systems', maps: [4, 5] },
+      { name: 'ESM 186 — Environmental Remote Sensing', maps: [2] },
+      { name: 'ABT 150 — Introduction to GIS', maps: [2, 3] },
+      { name: 'PLS 120 — Applied Statistics in Agricultural Sciences', maps: [3] },
+      { name: 'SSC 109 — Sustainable Nutrient Management', maps: [4, 5] },
     ],
-    explanation: 'UC Davis scores 85% based on overlap in plant-science AI, environmental sensing, and sustainability content. Their curriculum has deeper wet-lab biology components that our course does not replicate.',
+    explanation: 'UC Davis scores 85% based on their Precision Agriculture Minor in the Biological & Agricultural Engineering dept. The 18-credit programme covers GIS, GPS, Variable Rate Technologies, crop & soil sensors, and remote sensing. Their curriculum has deeper wet-lab biology components that our course does not replicate.',
   },
   {
-    name: 'ETH Zurich', country: 'Switzerland', flag: '🇨🇭',
-    focus: 'Agricultural Engineering & Robotics', match: 82,
-    url: 'https://ethz.ch/en/studies/master/degree-programmes/system-oriented-natural-sciences/agricultural-sciences.html',
+    name: 'ETH Zurich', country: 'Switzerland', flag: '\u{1F1E8}\u{1F1ED}',
+    focus: 'MSc Agricultural Sciences', match: 82,
+    logo: 'ethz',
+    url: 'https://usys.ethz.ch/en/studies/agricultural-sciences/master.html',
+    urlLabel: 'MSc Agricultural Sciences programme',
     courses: [
-      { name: 'Autonomous Systems in Agriculture', maps: [2, 6] },
-      { name: 'Data-Driven Crop Management', maps: [3] },
-      { name: 'Climate Modeling for Agriculture', maps: [4] },
+      { name: 'MSc Major: Plant Sciences (Crop & Grassland Science)', maps: [3] },
+      { name: 'MSc Major: Agricultural Economics', maps: [5] },
+      { name: 'Climate Modeling & Environmental Systems', maps: [4] },
+      { name: 'Data-Driven Crop Management electives', maps: [1, 2] },
     ],
-    explanation: 'ETH scores 82% with strong alignment in autonomy, data-driven crop management, and climate modeling. Their emphasis on mechanical robotics and hardware engineering goes beyond our AI-software focus.',
+    explanation: 'ETH scores 82% based on their 120-credit MSc Agricultural Sciences with three majors (Plant Sciences, Animal Sciences, Agricultural Economics). Strong alignment in data-driven crop management and climate modeling. Their emphasis on mechanical robotics and hardware engineering goes beyond our AI-software focus.',
   },
   {
-    name: 'University of Reading', country: 'UK', flag: '🇬🇧',
-    focus: 'Climate-Smart Agriculture', match: 80,
-    url: 'https://www.reading.ac.uk/modules/documents?acyear=2026%2f7&modcode=AD3ATC&schoolcode=APD',
+    name: 'University of Reading', country: 'UK', flag: '\u{1F1EC}\u{1F1E7}',
+    focus: 'MSc Agriculture & Development', match: 80,
+    logo: 'reading',
+    url: 'https://www.reading.ac.uk/ready-to-study/study/2026/international-development-and-applied-economics-pg/msc-agriculture-and-development',
+    urlLabel: 'MSc Agriculture & Development programme',
     courses: [
-      { name: 'Climate and Food Security', maps: [4] },
-      { name: 'Agricultural Technology & Innovation', maps: [1, 6] },
-      { name: 'Precision Agriculture', maps: [2, 3] },
+      { name: 'AD3CSA — Climate Smart Agriculture', maps: [4] },
+      { name: 'Agricultural Technology & Innovation modules', maps: [1, 6] },
+      { name: 'Sustainable Land Management', maps: [2, 3] },
+      { name: 'Applied Economics & Food Security', maps: [5] },
     ],
-    explanation: 'Reading scores 80% reflecting strong alignment in climate-smart agriculture and precision farming. Their broader policy and development economics modules are outside our scope.',
+    explanation: 'Reading scores 80% reflecting their MSc Agriculture & Development with a strong Climate Smart Agriculture module (AD3CSA) covering global climate systems, plant-soil-climate interactions, and hands-on crop simulation. Their broader policy and development economics modules are outside our scope.',
   },
 ];
 
@@ -92,15 +149,57 @@ const LEARNING_OUTCOMES = [
 
 const KEY_SKILLS = [
   { skill: 'AI Needs Assessment', category: 'Strategy', desc: 'Evaluate where AI adds the most value in agricultural operations' },
-  { skill: 'Data Pipeline Design', category: 'Technical', desc: 'Architect sensor-to-insight data flows for farm environments' },
-  { skill: 'Computer Vision Application', category: 'Technical', desc: 'Apply image recognition to crop disease, weed, and yield estimation' },
-  { skill: 'Predictive Modeling', category: 'Technical', desc: 'Build and interpret weather, yield, and demand prediction models' },
-  { skill: 'IoT Deployment Planning', category: 'Implementation', desc: 'Select, deploy, and manage agricultural IoT sensor networks' },
-  { skill: 'Climate Risk Analysis', category: 'Analysis', desc: 'Assess and mitigate climate-related agricultural risks using AI' },
-  { skill: 'Supply Chain Intelligence', category: 'Operations', desc: 'Optimize food logistics and reduce post-harvest losses' },
+  { skill: 'Data Pipeline Design', category: 'Technology', desc: 'Architect sensor-to-insight data flows for farm environments' },
+  { skill: 'Computer Vision Application', category: 'Technology', desc: 'Apply image recognition to crop disease, weed, and yield estimation' },
+  { skill: 'Predictive Modeling', category: 'Technology', desc: 'Build and interpret weather, yield, and demand prediction models' },
+  { skill: 'IoT Deployment Planning', category: 'Technology', desc: 'Select, deploy, and manage agricultural IoT sensor networks' },
+  { skill: 'Climate Risk Analysis', category: 'Agriculture', desc: 'Assess and mitigate climate-related agricultural risks using AI' },
+  { skill: 'Supply Chain Intelligence', category: 'Agriculture', desc: 'Optimize food logistics and reduce post-harvest losses' },
   { skill: 'AI Ethics & Governance', category: 'Leadership', desc: 'Navigate bias, privacy, and fairness in agricultural AI systems' },
   { skill: 'Stakeholder Communication', category: 'Leadership', desc: 'Translate AI insights for farmers, agronomists, and executives' },
   { skill: 'Organizational Readiness', category: 'Strategy', desc: "Assess and improve an organization's AI adoption maturity" },
+];
+
+// ── Circular Radar Skill Data ──
+// 4 Quadrants: Agriculture (top-right), Technology (bottom-right), Strategy (bottom-left), Leadership (top-left)
+// 5 concentric rings = depth levels 1-5 (how deeply the course covers the skill)
+const RADAR_QUADRANTS = [
+  { name: 'Agriculture', angleStart: 0, angleEnd: 90, color: '#198038' },
+  { name: 'Technology', angleStart: 90, angleEnd: 180, color: '#0043ce' },
+  { name: 'Strategy', angleStart: 180, angleEnd: 270, color: '#8a3ffc' },
+  { name: 'Leadership', angleStart: 270, angleEnd: 360, color: '#ee5396' },
+];
+
+const RADAR_SKILLS = [
+  // Agriculture quadrant (0-90 degrees)
+  { skill: 'Crop Disease Detection', level: 5, angle: 10, quadrant: 'Agriculture', module: 3, modules: [3], desc: 'AI-powered identification of plant diseases from imagery', topics: ['Computer vision', 'Leaf analysis', 'Disease classification'], lessons: ['les-3-2', 'les-3-3'] },
+  { skill: 'Precision Planting', level: 4, angle: 25, quadrant: 'Agriculture', module: 3, modules: [3], desc: 'Variable-rate seeding based on AI soil analysis', topics: ['Soil mapping', 'Variable-rate tech', 'Seed optimization'], lessons: ['les-3-1'] },
+  { skill: 'Yield Prediction', level: 5, angle: 40, quadrant: 'Agriculture', module: 3, modules: [3, 4], desc: 'Machine learning models for crop yield forecasting', topics: ['Regression models', 'Satellite data', 'Historical patterns'], lessons: ['les-3-4', 'les-3-5'] },
+  { skill: 'Climate Risk Analysis', level: 4, angle: 55, quadrant: 'Agriculture', module: 4, modules: [4], desc: 'AI assessment of climate threats to agricultural systems', topics: ['Climate modeling', 'Risk scoring', 'Adaptation planning'], lessons: ['les-4-1', 'les-4-2'] },
+  { skill: 'Water Management', level: 4, angle: 70, quadrant: 'Agriculture', module: 4, modules: [2, 4], desc: 'Smart irrigation and water conservation using AI', topics: ['Soil moisture AI', 'Irrigation scheduling', 'Water recycling'], lessons: ['les-4-3', 'les-2-4'] },
+  { skill: 'Supply Chain Intelligence', level: 4, angle: 82, quadrant: 'Agriculture', module: 5, modules: [5], desc: 'AI-optimized food logistics and distribution', topics: ['Route optimization', 'Cold chain AI', 'Demand forecasting'], lessons: ['les-5-1', 'les-5-2'] },
+
+  // Technology quadrant (90-180 degrees)
+  { skill: 'IoT Deployment Planning', level: 5, angle: 100, quadrant: 'Technology', module: 2, modules: [2], desc: 'Design and deploy agricultural sensor networks', topics: ['Sensor selection', 'Network design', 'Edge computing'], lessons: ['les-2-1', 'les-2-2'] },
+  { skill: 'Data Pipeline Design', level: 4, angle: 115, quadrant: 'Technology', module: 2, modules: [2, 3], desc: 'Architect sensor-to-insight data flows', topics: ['ETL processes', 'Real-time pipelines', 'Data lakes'], lessons: ['les-2-3', 'les-2-4'] },
+  { skill: 'Drone & Satellite Imaging', level: 4, angle: 128, quadrant: 'Technology', module: 2, modules: [2], desc: 'Aerial and space-based crop monitoring systems', topics: ['Multispectral imaging', 'NDVI analysis', 'Flight planning'], lessons: ['les-2-3', 'les-2-5'] },
+  { skill: 'Computer Vision', level: 5, angle: 142, quadrant: 'Technology', module: 3, modules: [3], desc: 'Image recognition for agricultural applications', topics: ['CNN models', 'Object detection', 'Image segmentation'], lessons: ['les-3-2', 'les-3-3'] },
+  { skill: 'Predictive Modeling', level: 4, angle: 155, quadrant: 'Technology', module: 3, modules: [3, 4, 5], desc: 'Build and interpret agricultural prediction models', topics: ['Regression', 'Time series', 'Ensemble methods'], lessons: ['les-3-4', 'les-4-2'] },
+  { skill: 'Weather Forecasting AI', level: 3, angle: 170, quadrant: 'Technology', module: 4, modules: [4], desc: 'AI-enhanced weather prediction for farming', topics: ['NWP integration', 'Local prediction', 'Alert systems'], lessons: ['les-4-1'] },
+
+  // Strategy quadrant (180-270 degrees)
+  { skill: 'AI Needs Assessment', level: 5, angle: 195, quadrant: 'Strategy', module: 1, modules: [1, 6], desc: 'Evaluate where AI adds most value in ag operations', topics: ['Value chain mapping', 'Opportunity scoring', 'ROI analysis'], lessons: ['les-1-1', 'les-1-4'] },
+  { skill: 'Organizational Readiness', level: 4, angle: 212, quadrant: 'Strategy', module: 6, modules: [6], desc: 'Assess and improve AI adoption maturity', topics: ['7 pillars framework', 'Change management', 'Skill gaps'], lessons: ['les-6-2', 'les-6-3'] },
+  { skill: 'ROI Frameworks', level: 3, angle: 228, quadrant: 'Strategy', module: 1, modules: [1, 5], desc: 'Calculate return on AI investments in agriculture', topics: ['Cost-benefit analysis', 'McKinsey $250B model', 'Payback periods'], lessons: ['les-1-4'] },
+  { skill: 'Technology Selection', level: 3, angle: 242, quadrant: 'Strategy', module: 6, modules: [1, 6], desc: 'Choose the right AI tools for specific farm needs', topics: ['Vendor evaluation', 'Build vs buy', 'Platform selection'], lessons: ['les-6-4'] },
+  { skill: 'AI Action Planning', level: 4, angle: 258, quadrant: 'Strategy', module: 6, modules: [6], desc: 'Create personal AI implementation roadmaps', topics: ['Goal setting', 'Milestone planning', 'Resource allocation'], lessons: ['les-6-5', 'les-6-6'] },
+
+  // Leadership quadrant (270-360 degrees)
+  { skill: 'AI Ethics & Governance', level: 5, angle: 282, quadrant: 'Leadership', module: 6, modules: [6], desc: 'Navigate bias, privacy, and fairness in agricultural AI', topics: ['Bias mitigation', 'Data privacy', 'Fairness frameworks'], lessons: ['les-6-1', 'les-6-2'] },
+  { skill: 'Stakeholder Communication', level: 4, angle: 298, quadrant: 'Leadership', module: 6, modules: [1, 6], desc: 'Translate AI insights for diverse audiences', topics: ['Farmer engagement', 'Executive reporting', 'Visualization'], lessons: ['les-6-3'] },
+  { skill: 'Human-AI Augmentation', level: 4, angle: 315, quadrant: 'Leadership', module: 6, modules: [6], desc: 'Design workflows where AI enhances human expertise', topics: ['Augmentation vs automation', 'Decision support', 'Trust building'], lessons: ['les-6-4', 'les-6-5'] },
+  { skill: 'Food Security Policy', level: 3, angle: 332, quadrant: 'Leadership', module: 1, modules: [1, 4], desc: 'AI-informed policy for global food systems', topics: ['2050 food challenge', 'Global adoption', 'Policy frameworks'], lessons: ['les-1-2', 'les-1-3'] },
+  { skill: 'Workforce Development', level: 3, angle: 348, quadrant: 'Leadership', module: 6, modules: [6], desc: 'Train agricultural teams for AI-augmented work', topics: ['Skill mapping', 'Training programs', 'Future workforce'], lessons: ['les-6-5', 'les-6-6'] },
 ];
 
 const COURSE_MODULES = [
@@ -112,56 +211,11 @@ const COURSE_MODULES = [
   { num: 6, title: 'The Human-AI Future', lessons: 6, duration: '50 min', color: '#ee5396', topics: ['AI ethics in agriculture', 'Organizational readiness', 'Future workforce models'] },
 ];
 
-const SKILL_CATEGORIES = {
-  'Strategy': '#0f62fe', 'Technical': '#8a3ffc', 'Implementation': '#198038',
-  'Analysis': '#007d79', 'Operations': '#f1c21b', 'Leadership': '#ee5396',
-};
-
-// ── Spider / Diamond Skill Profile Data ──
-const SKILL_AXES = [
-  {
-    axis: 'Corporations',
-    angle: 270, // top
-    skills: [
-      { skill: 'AI Needs Assessment', level: 85, module: 1, topics: ['4th Agricultural Revolution', 'Value chain analysis', 'AI readiness evaluation'] },
-      { skill: 'Supply Chain Intelligence', level: 78, module: 5, topics: ['Demand forecasting', 'Cold chain monitoring', 'Logistics optimization'] },
-      { skill: 'Organizational Readiness', level: 72, module: 6, topics: ['AI adoption maturity', 'Change management', 'ROI frameworks'] },
-    ],
-  },
-  {
-    axis: 'Leadership',
-    angle: 0, // right
-    skills: [
-      { skill: 'AI Ethics & Governance', level: 90, module: 6, topics: ['Bias mitigation', 'Privacy in agriculture', 'Fairness frameworks'] },
-      { skill: 'Stakeholder Communication', level: 82, module: 6, topics: ['Translating AI insights', 'Farmer engagement', 'Executive reporting'] },
-      { skill: 'Climate Risk Analysis', level: 76, module: 4, topics: ['Climate modeling', 'Adaptation planning', 'Risk communication'] },
-    ],
-  },
-  {
-    axis: 'Implementation',
-    angle: 90, // bottom
-    skills: [
-      { skill: 'IoT Deployment Planning', level: 88, module: 2, topics: ['Sensor selection', 'Network architecture', 'Edge computing'] },
-      { skill: 'Data Pipeline Design', level: 84, module: 2, topics: ['Sensor-to-insight flows', 'Data preprocessing', 'Real-time pipelines'] },
-      { skill: 'Computer Vision Application', level: 80, module: 3, topics: ['Crop disease detection', 'Weed identification', 'Yield estimation'] },
-    ],
-  },
-  {
-    axis: 'Strategy',
-    angle: 180, // left
-    skills: [
-      { skill: 'Predictive Modeling', level: 86, module: 3, topics: ['Weather prediction', 'Yield forecasting', 'Demand modeling'] },
-      { skill: 'AI Needs Assessment', level: 85, module: 1, topics: ['Value chain mapping', 'Opportunity scoring', 'Technology selection'] },
-      { skill: 'Climate Risk Analysis', level: 76, module: 4, topics: ['Drought prediction', 'Flood management', 'Carbon optimization'] },
-    ],
-  },
-];
-
-const AXIS_COLORS = {
-  'Corporations': '#f1c21b',
+const QUADRANT_COLORS = {
+  'Agriculture': '#198038',
+  'Technology': '#0043ce', 
+  'Strategy': '#8a3ffc',
   'Leadership': '#ee5396',
-  'Implementation': '#198038',
-  'Strategy': '#0f62fe',
 };
 
 const MODULE_COLORS = {
@@ -170,10 +224,10 @@ const MODULE_COLORS = {
 };
 
 const PERSONA_PHOTOS = {
+  'Khalid Al-Rashidi': '/images/persona-khalid.png',
   'Amara Johnson': '/images/persona-amara.png',
   'Carlos Mendoza': '/images/persona-carlos.png',
   'Dr. Fatima Okafor': '/images/persona-fatima.png',
-  'Khalid Al-Rashidi': '/images/persona-khalid.png',
   'Rajan Patel': '/images/persona-rajan.png',
 };
 
@@ -182,233 +236,302 @@ const PERSONAS = [
     name: 'Khalid Al-Rashidi', role: 'AgriTech Director', location: 'Riyadh, Saudi Arabia', initial: 'KR', color: '#da1e28',
     modules: [2, 4], industry: 'Desert Agriculture & Food Security',
     bio: 'Khalid leads digital transformation at a major Saudi agricultural company focused on desert farming using controlled-environment agriculture and AI-driven water management under Vision 2030.',
-    scenario: 'Managing greenhouse operations in Riyadh\'s extreme heat, Khalid deployed AI-controlled climate systems and hydroponic sensors that reduced water consumption by 90% compared to traditional farming. His team now produces 15 tonnes of tomatoes per greenhouse cycle using only recycled water.',
+    scenario: 'Managing greenhouse operations in Riyadh\'s extreme heat, Khalid deployed AI-controlled climate systems and hydroponic sensors that reduced water consumption by 90% compared to traditional farming.',
     challenge: 'How can AI and controlled-environment agriculture help arid nations achieve food security while conserving scarce water resources?',
   },
   {
     name: 'Amara Johnson', role: 'Wheat Farmer', location: 'Kansas, USA', initial: 'AJ', color: '#198038',
     modules: [1], industry: 'Large-scale Grain Farming',
-    bio: 'Amara is a 3rd-generation farmer managing 2,000 acres of wheat and sorghum. She values her family\'s farming intuition but is open to technology that can prove its worth in the field.',
-    scenario: 'When her GPS-guided tractor suggested variable-rate seeding based on soil analysis, Amara was skeptical. But after one season of 12% yield improvement, she became the biggest advocate for AI adoption in her county\'s farming cooperative.',
-    challenge: 'How can AI help experienced farmers make better decisions without replacing the intuition built over generations?',
+    bio: 'Amara is a 3rd-generation farmer managing 2,000 acres of wheat and sorghum. She values her family\'s farming intuition but is open to technology that can prove its worth.',
+    scenario: 'When her GPS-guided tractor suggested variable-rate seeding based on soil analysis, Amara was skeptical. But after one season of 12% yield improvement, she became the biggest AI adoption advocate in her county.',
+    challenge: 'How can AI help experienced farmers make better decisions without replacing generations of intuition?',
   },
   {
     name: 'Carlos Mendoza', role: 'Coffee Farmer', location: 'Huila, Colombia', initial: 'CM', color: '#0043ce',
     modules: [2, 3], industry: 'Specialty Coffee Production',
-    bio: 'Carlos runs a mid-size specialty coffee farm in the Colombian highlands. He\'s embraced IoT sensors and drone imaging to monitor his shade-grown Arabica plants and optimize harvest timing.',
-    scenario: 'Using soil moisture sensors and a weather prediction model, Carlos reduced his water usage by 30% while maintaining his farm\'s SCA cupping score above 85. His drone-captured multispectral images now detect coffee leaf rust 2 weeks before visible symptoms appear.',
-    challenge: 'Can precision sensing technology make specialty coffee farming both more sustainable and more profitable for smallholder farmers?',
+    bio: 'Carlos runs a mid-size specialty coffee farm. He\'s embraced IoT sensors and drone imaging to monitor his shade-grown Arabica plants and optimize harvest timing.',
+    scenario: 'Using soil moisture sensors and a weather prediction model, Carlos reduced water usage by 30% while maintaining his farm\'s SCA cupping score above 85.',
+    challenge: 'Can precision sensing make specialty coffee farming both more sustainable and more profitable for smallholder farmers?',
   },
   {
     name: 'Dr. Fatima Okafor', role: 'Agronomist', location: 'Lagos, Nigeria', initial: 'FO', color: '#8a3ffc',
     modules: [3, 4], industry: 'Agricultural Advisory',
-    bio: 'Dr. Okafor advises 50 smallholder farms across southwestern Nigeria. She combines satellite monitoring with AI platforms to deliver personalized crop management recommendations.',
-    scenario: 'When flooding threatened her farmers\' cassava crops, Fatima used a satellite-based early warning system to issue 72-hour advance alerts. The farmers who followed her AI-guided drainage recommendations saved 85% of their harvest.',
-    challenge: 'How can AI-powered advisory services scale to help millions of smallholder farmers who lack internet connectivity and technical literacy?',
+    bio: 'Dr. Okafor advises 50 smallholder farms across southwestern Nigeria using satellite monitoring and AI platforms to deliver personalized crop management recommendations.',
+    scenario: 'When flooding threatened her farmers\' cassava crops, Fatima used a satellite-based early warning system to issue 72-hour advance alerts, saving 85% of the harvest.',
+    challenge: 'How can AI-powered advisory services scale to help millions of smallholder farmers who lack internet connectivity?',
   },
   {
     name: 'Rajan Patel', role: 'Food Distributor', location: 'Mumbai, India', initial: 'RP', color: '#007d79',
     modules: [5, 6], industry: 'Agricultural Supply Chain',
-    bio: 'Rajan manages distribution of perishable goods across western India. He uses AI demand forecasting and IoT cold-chain monitoring to minimize food waste in a complex supply network.',
-    scenario: 'By implementing AI-powered demand prediction across 200 distribution points, Rajan reduced food waste by 40% and improved delivery freshness scores by 25%. His cold-chain sensors now trigger automatic rerouting when temperature anomalies are detected.',
-    challenge: 'Can AI transform agricultural supply chains in developing countries where infrastructure is fragmented and data is scarce?',
+    bio: 'Rajan manages distribution of perishable goods across western India using AI demand forecasting and IoT cold-chain monitoring to minimize food waste.',
+    scenario: 'By implementing AI-powered demand prediction across 200 distribution points, Rajan reduced food waste by 40% and improved delivery freshness scores by 25%.',
+    challenge: 'Can AI transform agricultural supply chains in developing countries where infrastructure is fragmented?',
   },
 ];
 
-// ── Interactive Spider / Diamond Skill Profile ──
-function SkillSpiderChart() {
-  const [activeAxis, setActiveAxis] = useState(null);
+// ── Interactive Circular Radar Skill Profile ──
+function SkillRadarChart() {
   const [activeSkill, setActiveSkill] = useState(null);
-  const svgRef = useRef(null);
+  const [activeQuadrant, setActiveQuadrant] = useState(null);
+  const [hoveredSkill, setHoveredSkill] = useState(null);
 
-  const cx = 200, cy = 200, maxR = 140;
-  const axes = SKILL_AXES;
+  const cx = 250, cy = 250, maxR = 200;
+  const rings = 5;
+  const ringSpacing = maxR / rings;
 
-  // Calculate average level per axis for the spider shape
-  const axisLevels = axes.map(a => {
-    const avg = a.skills.reduce((s, sk) => s + sk.level, 0) / a.skills.length;
-    return avg / 100; // normalize 0-1
-  });
-
-  // Generate polygon points for the spider shape
   const getPoint = (angleDeg, radius) => {
     const rad = (angleDeg - 90) * (Math.PI / 180);
     return { x: cx + radius * Math.cos(rad), y: cy + radius * Math.sin(rad) };
   };
 
-  // Background grid rings
-  const rings = [0.25, 0.5, 0.75, 1.0];
+  const concentricRings = Array.from({ length: rings }, (_, i) => i + 1);
 
-  // Spider polygon points
-  const spiderPoints = axes.map((a, i) => {
-    const pt = getPoint(a.angle, maxR * axisLevels[i]);
-    return `${pt.x},${pt.y}`;
-  }).join(' ');
-
-  // Background diamond
-  const bgPoints = axes.map(a => {
-    const pt = getPoint(a.angle, maxR);
-    return `${pt.x},${pt.y}`;
-  }).join(' ');
-
-  const handleAxisClick = (axisName) => {
-    if (activeAxis === axisName) {
-      setActiveAxis(null);
+  const handleSkillClick = (skill) => {
+    if (activeSkill?.skill === skill.skill) {
       setActiveSkill(null);
     } else {
-      setActiveAxis(axisName);
+      setActiveSkill(skill);
+      setActiveQuadrant(skill.quadrant);
+    }
+  };
+
+  const handleQuadrantClick = (name) => {
+    if (activeQuadrant === name) {
+      setActiveQuadrant(null);
+      setActiveSkill(null);
+    } else {
+      setActiveQuadrant(name);
       setActiveSkill(null);
     }
   };
 
-  const handleSkillClick = (skill) => {
-    setActiveSkill(activeSkill?.skill === skill.skill ? null : skill);
-  };
+  const filteredSkills = activeQuadrant
+    ? RADAR_SKILLS.filter(s => s.quadrant === activeQuadrant)
+    : RADAR_SKILLS;
 
-  const activeAxisData = axes.find(a => a.axis === activeAxis);
+  const displayedSkill = activeSkill || hoveredSkill;
 
   return (
-    <div className="spider-chart-container">
-      <div className="spider-chart-visual">
-        {/* Persona avatar in center */}
-        <div className="spider-center-avatar">
-          <img src="/images/persona-khalid.png" alt="AI Agriculture Practitioner" className="spider-center-img" />
-        </div>
-        <svg ref={svgRef} viewBox="0 0 400 400" className="spider-svg">
-          {/* Background grid */}
-          {rings.map((r, i) => (
-            <polygon key={i}
-              points={axes.map(a => { const pt = getPoint(a.angle, maxR * r); return `${pt.x},${pt.y}`; }).join(' ')}
-              fill="none" stroke="var(--border-subtle)" strokeWidth={i === rings.length - 1 ? 1.5 : 0.5}
-              strokeDasharray={i < rings.length - 1 ? '4 4' : 'none'}
-              opacity={0.6}
-            />
-          ))}
-
-          {/* Axis lines */}
-          {axes.map((a, i) => {
-            const end = getPoint(a.angle, maxR + 10);
-            return <line key={i} x1={cx} y1={cy} x2={end.x} y2={end.y}
-              stroke={activeAxis === a.axis ? AXIS_COLORS[a.axis] : 'var(--border-strong)'}
-              strokeWidth={activeAxis === a.axis ? 2 : 1} opacity={0.7} />;
-          })}
-
-          {/* Spider shape (filled area) */}
-          <polygon points={spiderPoints}
-            fill="var(--interactive-primary)" fillOpacity={0.12}
-            stroke="var(--interactive-primary)" strokeWidth={2}
-          />
-
-          {/* Data points on spider */}
-          {axes.map((a, i) => {
-            const pt = getPoint(a.angle, maxR * axisLevels[i]);
-            const isActive = activeAxis === a.axis;
+    <div className="radar-chart-container">
+      <div className="radar-chart-visual">
+        <svg viewBox="0 0 500 500" className="radar-svg">
+          {/* Quadrant background fills */}
+          {RADAR_QUADRANTS.map((q, i) => {
+            const startRad = (q.angleStart - 90) * (Math.PI / 180);
+            const endRad = (q.angleEnd - 90) * (Math.PI / 180);
+            const outerR = maxR;
+            const x1 = cx + outerR * Math.cos(startRad);
+            const y1 = cy + outerR * Math.sin(startRad);
+            const x2 = cx + outerR * Math.cos(endRad);
+            const y2 = cy + outerR * Math.sin(endRad);
             return (
-              <circle key={i} cx={pt.x} cy={pt.y} r={isActive ? 7 : 5}
-                fill={isActive ? AXIS_COLORS[a.axis] : 'var(--interactive-primary)'}
-                stroke="var(--bg-primary)" strokeWidth={2}
-                style={{ cursor: 'pointer', transition: 'all 0.2s' }}
-                onClick={() => handleAxisClick(a.axis)}
+              <path key={i}
+                d={`M ${cx} ${cy} L ${x1} ${y1} A ${outerR} ${outerR} 0 0 1 ${x2} ${y2} Z`}
+                fill={q.color}
+                fillOpacity={activeQuadrant === q.name ? 0.12 : 0.04}
+                stroke="none"
+                style={{ cursor: 'pointer', transition: 'fill-opacity 0.3s' }}
+                onClick={() => handleQuadrantClick(q.name)}
               />
             );
           })}
 
-          {/* Axis labels */}
-          {axes.map((a, i) => {
-            const labelPt = getPoint(a.angle, maxR + 30);
-            const isActive = activeAxis === a.axis;
+          {/* Concentric rings */}
+          {concentricRings.map(level => (
+            <circle key={level}
+              cx={cx} cy={cy} r={ringSpacing * level}
+              fill="none"
+              stroke="var(--border-subtle)"
+              strokeWidth={level === rings ? 1.5 : 0.5}
+              strokeDasharray={level < rings ? '3 3' : 'none'}
+              opacity={0.5}
+            />
+          ))}
+
+          {/* Ring level labels */}
+          {concentricRings.map(level => (
+            <text key={`label-${level}`}
+              x={cx + 6} y={cy - ringSpacing * level + 3}
+              fill="var(--text-tertiary)" fontSize={9}
+              fontFamily="var(--font-mono)" opacity={0.7}>
+              L{level}
+            </text>
+          ))}
+
+          {/* Quadrant divider lines */}
+          {RADAR_QUADRANTS.map((q, i) => {
+            const end = getPoint(q.angleStart, maxR + 5);
             return (
-              <g key={`label-${i}`} style={{ cursor: 'pointer' }} onClick={() => handleAxisClick(a.axis)}>
+              <line key={i}
+                x1={cx} y1={cy} x2={end.x} y2={end.y}
+                stroke="var(--border-strong)" strokeWidth={1} opacity={0.4}
+              />
+            );
+          })}
+
+          {/* Skill dots */}
+          {RADAR_SKILLS.map((skill, i) => {
+            const radius = ringSpacing * skill.level;
+            const pt = getPoint(skill.angle, radius);
+            const isActive = activeSkill?.skill === skill.skill;
+            const isHovered = hoveredSkill?.skill === skill.skill;
+            const isInActiveQuadrant = !activeQuadrant || skill.quadrant === activeQuadrant;
+            const qColor = QUADRANT_COLORS[skill.quadrant];
+
+            return (
+              <g key={i} style={{ cursor: 'pointer' }}
+                onClick={() => handleSkillClick(skill)}
+                onMouseEnter={() => setHoveredSkill(skill)}
+                onMouseLeave={() => setHoveredSkill(null)}>
+                {(isActive || isHovered) && (
+                  <circle cx={pt.x} cy={pt.y} r={12}
+                    fill={qColor} fillOpacity={0.15}
+                    stroke={qColor} strokeWidth={1} strokeOpacity={0.4}
+                  />
+                )}
+                {isActive && (
+                  <line x1={cx} y1={cy} x2={pt.x} y2={pt.y}
+                    stroke={qColor} strokeWidth={1} strokeDasharray="4 4" opacity={0.5}
+                  />
+                )}
+                <circle cx={pt.x} cy={pt.y}
+                  r={isActive ? 7 : isHovered ? 6 : 4.5}
+                  fill={qColor}
+                  fillOpacity={isInActiveQuadrant ? 1 : 0.3}
+                  stroke="var(--bg-primary)" strokeWidth={isActive ? 2.5 : 1.5}
+                  style={{ transition: 'all 0.2s' }}
+                />
+                {(isActive || isHovered) && (
+                  <text x={pt.x} y={pt.y - 14}
+                    textAnchor="middle" dominantBaseline="auto"
+                    fill="var(--text-primary)" fontSize={10}
+                    fontWeight={600} fontFamily="var(--font-sans)">
+                    {skill.skill}
+                  </text>
+                )}
+              </g>
+            );
+          })}
+
+          {/* Quadrant labels */}
+          {RADAR_QUADRANTS.map((q, i) => {
+            const midAngle = (q.angleStart + q.angleEnd) / 2;
+            const labelPt = getPoint(midAngle, maxR + 28);
+            const isActive = activeQuadrant === q.name;
+            const skillCount = RADAR_SKILLS.filter(s => s.quadrant === q.name).length;
+            return (
+              <g key={`qlabel-${i}`} style={{ cursor: 'pointer' }} onClick={() => handleQuadrantClick(q.name)}>
                 <text x={labelPt.x} y={labelPt.y}
                   textAnchor="middle" dominantBaseline="middle"
-                  fill={isActive ? AXIS_COLORS[a.axis] : 'var(--text-primary)'}
-                  fontSize={isActive ? 13 : 12}
-                  fontWeight={isActive ? 700 : 600}
-                  fontFamily="var(--font-sans)"
-                >
-                  {a.axis}
+                  fill={isActive ? q.color : 'var(--text-primary)'}
+                  fontSize={isActive ? 13 : 12} fontWeight={isActive ? 700 : 600}
+                  fontFamily="var(--font-sans)">
+                  {q.name}
                 </text>
-                <text x={labelPt.x} y={labelPt.y + 16}
+                <text x={labelPt.x} y={labelPt.y + 15}
                   textAnchor="middle" dominantBaseline="middle"
                   fill="var(--text-tertiary)" fontSize={10}
-                  fontFamily="var(--font-mono)"
-                >
-                  {Math.round(axisLevels[i] * 100)}%
+                  fontFamily="var(--font-mono)">
+                  {skillCount} skills
                 </text>
               </g>
             );
           })}
 
-          {/* Ring labels */}
-          {rings.map((r, i) => (
-            <text key={`ring-${i}`} x={cx + 4} y={cy - maxR * r - 4}
-              fill="var(--text-tertiary)" fontSize={9} fontFamily="var(--font-mono)">
-              {Math.round(r * 100)}%
-            </text>
-          ))}
+          {/* Center label */}
+          <circle cx={cx} cy={cy} r={18} fill="var(--bg-secondary)" stroke="var(--border-subtle)" strokeWidth={1} />
+          <text x={cx} y={cy - 3} textAnchor="middle" dominantBaseline="middle"
+            fill="var(--text-primary)" fontSize={8} fontWeight={700} fontFamily="var(--font-sans)">SKILL</text>
+          <text x={cx} y={cy + 7} textAnchor="middle" dominantBaseline="middle"
+            fill="var(--text-primary)" fontSize={8} fontWeight={700} fontFamily="var(--font-sans)">RADAR</text>
         </svg>
       </div>
 
-      {/* Skill detail panel */}
-      <div className="spider-chart-detail">
-        {!activeAxis && (
-          <div className="spider-detail-prompt">
+      {/* Detail panel */}
+      <div className="radar-chart-detail">
+        {!displayedSkill && !activeQuadrant && (
+          <div className="radar-detail-prompt">
             <AiModelIcon size={32} color="var(--interactive-primary)" />
-            <h4>Explore Your Skill Profile</h4>
-            <p>Click any axis on the diamond chart to explore the skills you will develop in that dimension.</p>
-            <div className="spider-axis-pills">
-              {axes.map(a => (
-                <button key={a.axis} className="spider-axis-pill"
-                  style={{ borderColor: AXIS_COLORS[a.axis], color: AXIS_COLORS[a.axis] }}
-                  onClick={() => handleAxisClick(a.axis)}>
-                  {a.axis}
+            <h4>Explore the Skill Radar</h4>
+            <p>Click any dot on the radar to see where that skill is covered in the course. Each ring represents the depth of coverage (Level 1-5). Click a quadrant label to filter.</p>
+            <div className="radar-quadrant-pills">
+              {RADAR_QUADRANTS.map(q => (
+                <button key={q.name} className="radar-quadrant-pill"
+                  style={{ borderColor: q.color, color: q.color }}
+                  onClick={() => handleQuadrantClick(q.name)}>
+                  {q.name}
                 </button>
               ))}
             </div>
           </div>
         )}
 
-        {activeAxisData && (
-          <div className="spider-detail-panel" key={activeAxis}>
-            <div className="spider-detail-header">
-              <div className="spider-detail-axis-badge" style={{ borderColor: AXIS_COLORS[activeAxis], color: AXIS_COLORS[activeAxis] }}>
-                {activeAxis}
-              </div>
-              <div className="spider-detail-avg">
-                {Math.round(axisLevels[axes.indexOf(activeAxisData)] * 100)}% proficiency
-              </div>
+        {activeQuadrant && !displayedSkill && (
+          <div className="radar-quadrant-panel">
+            <div className="radar-quadrant-header" style={{ borderColor: QUADRANT_COLORS[activeQuadrant] }}>
+              <h4 style={{ color: QUADRANT_COLORS[activeQuadrant] }}>{activeQuadrant}</h4>
+              <span className="radar-quadrant-count">{filteredSkills.length} skills</span>
             </div>
-
-            <div className="spider-skills-list">
-              {activeAxisData.skills.map((sk, i) => (
-                <div key={i} className={`spider-skill-item ${activeSkill?.skill === sk.skill ? 'active' : ''}`}
-                  onClick={() => handleSkillClick(sk)}>
-                  <div className="spider-skill-row">
-                    <span className="spider-skill-name">{sk.skill}</span>
-                    <span className="spider-skill-level" style={{ color: AXIS_COLORS[activeAxis] }}>{sk.level}%</span>
-                  </div>
-                  <div className="spider-skill-bar">
-                    <div className="spider-skill-bar-fill" style={{ width: `${sk.level}%`, background: AXIS_COLORS[activeAxis] }} />
-                  </div>
-
-                  {activeSkill?.skill === sk.skill && (
-                    <div className="spider-skill-expanded">
-                      <div className="spider-skill-module">
-                        <span className="spider-skill-module-tag" style={{ borderColor: MODULE_COLORS[sk.module], color: MODULE_COLORS[sk.module] }}>
-                          Module {sk.module}: {MODULE_LABELS[sk.module - 1]}
-                        </span>
-                      </div>
-                      <div className="spider-skill-topics">
-                        <span className="spider-skill-topics-label">Topics covered:</span>
-                        {sk.topics.map((t, ti) => (
-                          <span key={ti} className="spider-skill-topic-tag">{t}</span>
-                        ))}
-                      </div>
+            <div className="radar-skills-list">
+              {filteredSkills.map((sk, i) => (
+                <div key={i} className="radar-skill-list-item" onClick={() => handleSkillClick(sk)} style={{ cursor: 'pointer' }}>
+                  <div className="radar-skill-list-row">
+                    <span className="radar-skill-list-name">{sk.skill}</span>
+                    <div className="radar-skill-level-dots">
+                      {[1,2,3,4,5].map(l => (
+                        <span key={l} className={`radar-level-dot ${l <= sk.level ? 'filled' : ''}`}
+                          style={l <= sk.level ? { background: QUADRANT_COLORS[activeQuadrant] } : {}} />
+                      ))}
                     </div>
-                  )}
+                  </div>
+                  <p className="radar-skill-list-desc">{sk.desc}</p>
                 </div>
               ))}
             </div>
+            <button className="radar-clear-btn" onClick={() => { setActiveQuadrant(null); setActiveSkill(null); }}>Show All Quadrants</button>
+          </div>
+        )}
+
+        {displayedSkill && (
+          <div className="radar-skill-detail" key={displayedSkill.skill}>
+            <div className="radar-skill-detail-header">
+              <div className="radar-skill-detail-badge" style={{ borderColor: QUADRANT_COLORS[displayedSkill.quadrant], color: QUADRANT_COLORS[displayedSkill.quadrant] }}>
+                {displayedSkill.quadrant}
+              </div>
+              <div className="radar-skill-level-indicator">
+                <span className="radar-level-label">Depth:</span>
+                <div className="radar-skill-level-dots">
+                  {[1,2,3,4,5].map(l => (
+                    <span key={l} className={`radar-level-dot ${l <= displayedSkill.level ? 'filled' : ''}`}
+                      style={l <= displayedSkill.level ? { background: QUADRANT_COLORS[displayedSkill.quadrant] } : {}} />
+                  ))}
+                </div>
+                <span className="radar-level-text">Level {displayedSkill.level}/5</span>
+              </div>
+            </div>
+            <h4 className="radar-skill-detail-name">{displayedSkill.skill}</h4>
+            <p className="radar-skill-detail-desc">{displayedSkill.desc}</p>
+            <div className="radar-skill-modules">
+              <span className="radar-skill-section-label">Covered in:</span>
+              {displayedSkill.modules.map(m => (
+                <span key={m} className="radar-skill-module-tag" style={{ borderColor: MODULE_COLORS[m], color: MODULE_COLORS[m] }}>
+                  Module {m}: {MODULE_LABELS[m - 1]}
+                </span>
+              ))}
+            </div>
+            <div className="radar-skill-topics">
+              <span className="radar-skill-section-label">Topics:</span>
+              <div className="radar-skill-topic-list">
+                {displayedSkill.topics.map((t, i) => (
+                  <span key={i} className="radar-skill-topic-tag">{t}</span>
+                ))}
+              </div>
+            </div>
+            {activeSkill && (
+              <button className="radar-clear-btn" onClick={() => setActiveSkill(null)}>
+                Back to {activeQuadrant || 'Overview'}
+              </button>
+            )}
           </div>
         )}
       </div>
@@ -502,14 +625,14 @@ export default function CourseOverviewPage() {
         <div className="co-hero-image-content">
           <div className="co-hero-badge">
             <CheckmarkOutlineIcon size={14} />
-            University-Benchmarked Curriculum
+            Practitioner-Focused Curriculum <span className="co-version-tag">v1.0</span>
           </div>
           <h1 className="co-hero-image-title">
             <strong>AI</strong> in Agriculture:<br />From Field to <strong>Future</strong>
           </h1>
           <p className="co-hero-image-subtitle">
             A comprehensive, practitioner-focused curriculum designed to transform agricultural professionals
-            into AI-augmented decision makers. Benchmarked against leading university programs worldwide.
+            into AI-augmented decision makers.
           </p>
           <div className="co-hero-actions">
             <button className="btn btn-primary btn-lg" onClick={() => navigate('/dashboard')}>
@@ -599,11 +722,11 @@ export default function CourseOverviewPage() {
           <div className="section-label">Competencies</div>
           <h2 className="section-title">Key Skills You Will Gain</h2>
           <p className="section-desc">
-            Explore the four dimensions of your AI Agriculture Practitioner skill profile.
-            Click any axis to dive into detailed skill breakdowns.
+            Explore 23 skills across four dimensions. Each dot represents a skill covered in the course.
+            The ring level (1-5) shows the depth of coverage. Click any dot to explore.
           </p>
         </div>
-        <SkillSpiderChart />
+        <SkillRadarChart />
       </div>
 
       {/* University Benchmark */}
@@ -633,7 +756,7 @@ export default function CourseOverviewPage() {
               <div className="co-benchmark-row-v2" onClick={() => toggleUni(i)} role="button" tabIndex={0}
                 onKeyDown={(e) => e.key === 'Enter' && toggleUni(i)}>
                 <div className="co-benchmark-left">
-                  <SchoolIcon size={20} color="var(--interactive-primary)" />
+                  <UniLogo uni={u.logo} size={36} />
                   <div>
                     <div className="co-benchmark-name">
                       {u.flag} {u.name}
@@ -672,7 +795,7 @@ export default function CourseOverviewPage() {
                   </div>
                   <a href={u.url} target="_blank" rel="noopener noreferrer" className="co-benchmark-link">
                     <LaunchIcon size={14} />
-                    View {u.name} program details
+                    View {u.urlLabel || `${u.name} program details`}
                   </a>
                 </div>
               )}
